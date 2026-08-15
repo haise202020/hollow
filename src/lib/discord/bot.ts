@@ -316,14 +316,7 @@ async function handleOrderButton(
   }
 
   const adminStatus = action === "order_approve" ? "APROVADO" : "REJEITADO";
-
-  if (adminStatus === "APROVADO" && order.status !== "COMPLETO") {
-    return {
-      ok: false,
-      content:
-        "Pagamento ainda não confirmado (PIX). Aguarde o status COMPLETO antes de aprovar a entrega.",
-    };
-  }
+  const wasUnpaid = order.status !== "COMPLETO";
 
   const updated = await updateOrderAdmin(orderId, adminStatus, {
     approvedBy: userTag,
@@ -336,6 +329,7 @@ async function handleOrderButton(
     };
   }
 
+  // Aprovação Discord também libera o pedido no site (PIX automático OU presente/manual).
   const finalized =
     adminStatus === "APROVADO"
       ? (await updateOrderStatus(orderId, "COMPLETO", {
@@ -346,7 +340,9 @@ async function handleOrderButton(
       : updated;
 
   console.log(
-    `[discord] Pedido ${orderId} → ${adminStatus} por ${userTag}`,
+    `[discord] Pedido ${orderId} → ${adminStatus} por ${userTag}${
+      adminStatus === "APROVADO" && wasUnpaid ? " (manual/presente)" : ""
+    }`,
   );
 
   await refreshOrderDiscordMessage(finalized);
@@ -363,7 +359,9 @@ async function handleOrderButton(
     ok: true,
     content:
       adminStatus === "APROVADO"
-        ? `Pedido \`${orderId}\` aprovado por ${userTag}. Entrega enviada ao canal de delivery.`
+        ? wasUnpaid
+          ? `Pedido \`${orderId}\` aprovado manualmente por ${userTag} (sem PIX). Entrega enviada ao canal de delivery.`
+          : `Pedido \`${orderId}\` aprovado por ${userTag}. Entrega enviada ao canal de delivery.`
         : `Pedido \`${orderId}\` recusado por ${userTag}.`,
   };
 }

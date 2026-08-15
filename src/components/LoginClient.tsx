@@ -84,16 +84,16 @@ export function LoginClient() {
         </Link>
 
         <div className="mx-auto flex w-full max-w-[340px] flex-1 flex-col justify-center py-10">
-          <div className="mb-6 flex gap-5">
+          <div className="mb-6 grid grid-cols-2 gap-1 rounded-xl border border-white/[0.08] bg-[#101016] p-1">
             <button
               type="button"
               onClick={() => {
                 setMode("login");
                 setError("");
               }}
-              className={`pb-1 text-[13px] font-medium transition ${
+              className={`rounded-lg px-3 py-2.5 text-[13px] font-semibold transition ${
                 mode === "login"
-                  ? "text-white"
+                  ? "bg-[var(--purple)] text-white"
                   : "text-[var(--fg-muted)] hover:text-white"
               }`}
             >
@@ -105,9 +105,9 @@ export function LoginClient() {
                 setMode("register");
                 setError("");
               }}
-              className={`pb-1 text-[13px] font-medium transition ${
+              className={`rounded-lg px-3 py-2.5 text-[13px] font-semibold transition ${
                 mode === "register"
-                  ? "text-white"
+                  ? "bg-[var(--purple)] text-white"
                   : "text-[var(--fg-muted)] hover:text-white"
               }`}
             >

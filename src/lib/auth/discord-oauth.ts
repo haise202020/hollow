@@ -1,7 +1,19 @@
+function normalizeAbsoluteUrl(raw: string, fallback: string): string {
+  const trimmed = raw.trim().replace(/\/$/, "");
+  if (!trimmed) return fallback;
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed.replace(/\/$/, "");
+  }
+
+  // Evita redirect_uri inválido tipo "hollow-mu.vercel.app/..." (sem protocolo)
+  return `https://${trimmed.replace(/^\/+/, "")}`.replace(/\/$/, "");
+}
+
 export function getSiteUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "") ||
-    "http://localhost:3000"
+  return normalizeAbsoluteUrl(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "",
+    "http://localhost:3000",
   );
 }
 
@@ -11,9 +23,10 @@ export function getDiscordOAuthConfig() {
     process.env.DISCORD_APPLICATION_ID?.trim() ||
     "";
   const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim() || "";
-  const redirectUri =
-    process.env.DISCORD_REDIRECT_URI?.trim() ||
-    `${getSiteUrl()}/api/auth/discord/callback`;
+  const redirectUri = normalizeAbsoluteUrl(
+    process.env.DISCORD_REDIRECT_URI ?? "",
+    `${getSiteUrl()}/api/auth/discord/callback`,
+  );
 
   return { clientId, clientSecret, redirectUri };
 }
