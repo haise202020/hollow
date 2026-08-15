@@ -1,0 +1,223 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { getSession } from "@/lib/auth/session";
+import { formatBrl, gamepassPriceForNetRobux } from "@/lib/data/catalog";
+import { resolveCheckoutItem } from "@/lib/orders/pricing";
+import { createOrderId, createOrderViewToken, saveOrder } from "@/lib/orders/store";
+import type { Order } from "@/lib/orders/types";
+import {
+  createPixTransaction,
+  normalizePaymentStatus,
+} from "@/lib/payments/misticpay";
+import { findMatchingGamepass } from "@/lib/roblox/gamepasses";
+import { gatewayPayerFromUsername, lookupRobloxUser } from "@/lib/roblox/lookup";
+import { assertCsrf, CSRF_COOKIE } from "@/lib/security/csrf-core";
+import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
+import { sanitizeText, sanitizeUsername } from "@/lib/security/sanitize";
+
+const bodySchema = z.object({
+  type: z.enum(["robux", "gamepass"]),
+  robuxAmount: z.number().optional(),
+  gamepassId: z.string().optional(),
+  robloxUsername: z.string().min(3).max(20),
+  robloxUserId: z.number().int().positive(),
+  robloxGamepassId: z.number().int().positive().optional(),
+});
+
+export async function POST(request: Request) {
+  const ip = getClientIp(request.headers);
+  const limited = rateLimit(`checkout-create:${ip}`, 8, 60_000);
+
+  if (!limited.success) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Aguarde um minuto." },
+      { status: 429 },
+    );
+  }
+
+  const cookieHeader = request.headers.get("cookie") ?? "";
+  const cookieToken = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
+    ?.split("=")[1];
+
+  if (!(await assertCsrf(request, cookieToken))) {
+    return NextResponse.json({ error: "Token CSRF inválido." }, { status: 403 });
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
+  }
+
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Payload inválido." }, { status: 400 });
+  }
+
+  const raw = body as Record<string, unknown>;
+  const candidate = {
+    type: raw.type,
+    robuxAmount:
+      typeof raw.robuxAmount === "number"
+        ? raw.robuxAmount
+        : Number(raw.robuxAmount),
+    gamepassId:
+      typeof raw.gamepassId === "string"
+        ? sanitizeText(raw.gamepassId, 40)
+        : undefined,
+    robloxUsername: sanitizeUsername(raw.robloxUsername),
+    robloxUserId: Number(raw.robloxUserId),
+    robloxGamepassId:
+      raw.robloxGamepassId === undefined || raw.robloxGamepassId === null
+        ? undefined
+        : Number(raw.robloxGamepassId),
+  };
+
+  const parsed = bodySchema.safeParse(candidate);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Dados inválidos.", details: parsed.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  let profile;
+  try {
+    profile = await lookupRobloxUser(parsed.data.robloxUsername);
+  } catch {
+    return NextResponse.json(
+      { error: "Não foi possível validar o usuário do Roblox." },
+      { status: 502 },
+    );
+  }
+
+  if (!profile || profile.id !== parsed.data.robloxUserId) {
+    return NextResponse.json(
+      { error: "Conta do Roblox inválida. Busque o usuário novamente." },
+      { status: 400 },
+    );
+  }
+
+  const item = resolveCheckoutItem({
+    type: parsed.data.type,
+    robuxAmount: parsed.data.robuxAmount,
+    gamepassId: parsed.data.gamepassId,
+  });
+
+  if (!item) {
+    return NextResponse.json({ error: "Produto inválido." }, { status: 400 });
+  }
+
+  if (item.amountBrl < 1) {
+    return NextResponse.json(
+      { error: "Valor mínimo para PIX é R$ 1,00." },
+      { status: 400 },
+    );
+  }
+
+  let verifiedGamepassId: number | undefined;
+
+  if (item.type === "robux" && item.robuxAmount) {
+    const requiredPrice = gamepassPriceForNetRobux(item.robuxAmount);
+    try {
+      const detection = await findMatchingGamepass({
+        userId: profile.id,
+        requiredPrice,
+      });
+
+      if (
+        !detection.matched ||
+        (parsed.data.robloxGamepassId &&
+          detection.matched.id !== parsed.data.robloxGamepassId)
+      ) {
+        return NextResponse.json(
+          {
+            error: `Gamepass de ${requiredPrice.toLocaleString("pt-BR")} Robux ainda não encontrada na sua conta.`,
+          },
+          { status: 400 },
+        );
+      }
+
+      verifiedGamepassId = detection.matched.id;
+    } catch {
+      return NextResponse.json(
+        { error: "Não foi possível validar a gamepass agora." },
+        { status: 502 },
+      );
+    }
+  }
+
+  const orderId = createOrderId();
+  const viewToken = createOrderViewToken();
+  const now = new Date().toISOString();
+  const gatewayPayer = gatewayPayerFromUsername(profile.name);
+  const session = await getSession();
+
+  try {
+    const pix = await createPixTransaction({
+      amount: item.amountBrl,
+      payerName: gatewayPayer.payerName,
+      payerDocument: gatewayPayer.payerDocument,
+      transactionId: orderId,
+      description: `Hollow — ${item.productLabel} @${profile.name}`,
+    });
+
+    const order: Order = {
+      id: orderId,
+      type: item.type,
+      productLabel: item.productLabel,
+      amountBrl: item.amountBrl,
+      robuxAmount: item.robuxAmount,
+      gamepassId: item.gamepassId,
+      robloxGamepassId: verifiedGamepassId,
+      robloxUserId: profile.id,
+      robloxUsername: profile.name,
+      accountUserId: session?.sub,
+      viewToken,
+      payerName: gatewayPayer.payerName,
+      payerDocument: gatewayPayer.payerDocument,
+      status: normalizePaymentStatus(pix.transactionState),
+      adminStatus: "AGUARDANDO",
+      misticTransactionId: pix.transactionId,
+      copyPaste: pix.copyPaste,
+      qrCodeBase64: pix.qrCodeBase64,
+      qrcodeUrl: pix.qrcodeUrl,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await saveOrder(order);
+
+    void import("@/lib/discord/bot")
+      .then(({ notifyOrderCreated }) => notifyOrderCreated(order))
+      .catch((error) => {
+        console.error("[discord] Falha ao notificar pedido:", error);
+      });
+
+    return NextResponse.json({
+      ok: true,
+      order: {
+        id: order.id,
+        status: order.status,
+        adminStatus: order.adminStatus,
+        productLabel: order.productLabel,
+        amountBrl: order.amountBrl,
+        amountFormatted: formatBrl(order.amountBrl),
+        robloxUsername: order.robloxUsername,
+        copyPaste: order.copyPaste,
+        qrCodeBase64: order.qrCodeBase64,
+        qrcodeUrl: order.qrcodeUrl,
+        viewToken: order.viewToken,
+      },
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Não foi possível gerar o PIX. Tente novamente.";
+    return NextResponse.json({ error: message }, { status: 502 });
+  }
+}
