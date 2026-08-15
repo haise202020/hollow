@@ -10,6 +10,7 @@ import {
   LogoutIcon,
   UserIcon,
 } from "@/components/icons";
+import { prefetchAccountData } from "@/components/account/useAccountData";
 
 const navItems = [
   { href: "/", label: "Início" },
@@ -199,7 +200,10 @@ export function Header() {
                 type="button"
                 aria-expanded={menuOpen}
                 aria-haspopup="menu"
-                onClick={() => setMenuOpen((value) => !value)}
+                onClick={() => {
+                  prefetchAccountData();
+                  setMenuOpen((value) => !value);
+                }}
                 className={`inline-flex items-center gap-2 rounded-xl border bg-white/[0.03] py-1 pl-1 pr-2.5 transition ${
                   menuOpen
                     ? "border-[var(--purple-bright)]"
@@ -232,6 +236,9 @@ export function Header() {
                 <div
                   role="menu"
                   className="user-menu-enter absolute right-0 mt-2 w-[220px] overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101014] p-2 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
+                  onMouseEnter={() => {
+                    prefetchAccountData();
+                  }}
                 >
                   {menuItems.map((item) => {
                     const Icon = item.icon;

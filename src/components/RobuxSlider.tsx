@@ -107,7 +107,7 @@ export function RobuxSlider() {
       </div>
 
       <div className="relative mt-16 animate-rise-delay sm:mt-20 lg:mt-0">
-        <div className="pointer-events-none absolute -top-28 left-1/2 z-10 w-[180px] -translate-x-1/2 sm:-top-32 sm:w-[210px] lg:left-[58%]">
+        <div className="pointer-events-none absolute -top-[calc(7rem+0.5cm)] left-1/2 z-10 w-[180px] -translate-x-1/2 translate-x-[0.5cm] sm:-top-[calc(8rem+0.5cm)] sm:w-[210px] lg:left-[58%]">
           <Image
             src={DETAILS_MASCOT}
             alt="Mascote Hollow"

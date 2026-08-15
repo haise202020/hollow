@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 export type StatusTone = "pending" | "approved" | "rejected" | "paid" | "failed";
 
@@ -48,52 +48,128 @@ export const TONE_STYLES: Record<StatusTone, string> = {
   failed: "border-red-400/25 bg-red-500/10 text-red-200",
 };
 
+type AccountCache = {
+  user: AccountUser | null;
+  stats: AccountStats | null;
+  orders: AccountOrder[];
+  error: string;
+  updatedAt: number;
+};
+
+let memoryCache: AccountCache | null = null;
+let inflight: Promise<AccountCache> | null = null;
+const listeners = new Set<() => void>();
+
+function emit() {
+  listeners.forEach((listener) => listener());
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function getSnapshot(): AccountCache | null {
+  return memoryCache;
+}
+
+function getServerSnapshot(): AccountCache | null {
+  return null;
+}
+
+async function fetchAccountData(): Promise<AccountCache> {
+  const response = await fetch("/api/dashboard", { cache: "no-store" });
+  if (response.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
+  const data = (await response.json()) as {
+    user?: AccountUser;
+    stats?: AccountStats;
+    orders?: AccountOrder[];
+    error?: string;
+  };
+  if (!response.ok) {
+    throw new Error(data.error ?? "Falha ao carregar dados.");
+  }
+  return {
+    user: data.user ?? null,
+    stats: data.stats ?? null,
+    orders: data.orders ?? [],
+    error: "",
+    updatedAt: Date.now(),
+  };
+}
+
+async function loadAccountData(force = false): Promise<AccountCache> {
+  const freshEnough =
+    memoryCache && Date.now() - memoryCache.updatedAt < 8_000 && !force;
+  if (freshEnough && memoryCache) return memoryCache;
+
+  if (inflight && !force) return inflight;
+
+  inflight = fetchAccountData()
+    .then((next) => {
+      memoryCache = next;
+      emit();
+      return next;
+    })
+    .finally(() => {
+      inflight = null;
+    });
+
+  return inflight;
+}
+
+/** Prefetch compartilhado (ex.: ao abrir o menu do usuário). */
+export function prefetchAccountData() {
+  void loadAccountData(false).catch(() => undefined);
+}
+
 export function useAccountData(pollMs = 0) {
   const router = useRouter();
-  const [user, setUser] = useState<AccountUser | null>(null);
-  const [stats, setStats] = useState<AccountStats | null>(null);
-  const [orders, setOrders] = useState<AccountOrder[]>([]);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const cached = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+  const [error, setError] = useState(cached?.error ?? "");
+  const [loading, setLoading] = useState(!cached);
 
-  const load = useCallback(async () => {
-    try {
-      const response = await fetch("/api/dashboard", { cache: "no-store" });
-      if (response.status === 401) {
-        router.replace("/login");
-        return;
+  const refresh = useCallback(
+    async (force = false) => {
+      try {
+        const next = await loadAccountData(force);
+        setError(next.error);
+        setLoading(false);
+      } catch (err) {
+        if (err instanceof Error && err.message === "UNAUTHORIZED") {
+          router.replace("/login");
+          return;
+        }
+        setError(err instanceof Error ? err.message : "Falha de rede ao carregar.");
+        setLoading(false);
       }
-      const data = (await response.json()) as {
-        user?: AccountUser;
-        stats?: AccountStats;
-        orders?: AccountOrder[];
-        error?: string;
-      };
-      if (!response.ok) {
-        setError(data.error ?? "Falha ao carregar dados.");
-        return;
-      }
-      setUser(data.user ?? null);
-      setStats(data.stats ?? null);
-      setOrders(data.orders ?? []);
-      setError("");
-    } catch {
-      setError("Falha de rede ao carregar.");
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
+    },
+    [router],
+  );
 
   useEffect(() => {
-    void load();
+    void refresh(false);
     if (!pollMs) return;
     const timer = window.setInterval(() => {
-      void load();
+      void refresh(true);
     }, pollMs);
     return () => window.clearInterval(timer);
-  }, [load, pollMs]);
+  }, [pollMs, refresh]);
 
-  return { user, stats, orders, error, loading, reload: load };
+  return {
+    user: cached?.user ?? null,
+    stats: cached?.stats ?? null,
+    orders: cached?.orders ?? [],
+    error,
+    loading,
+    reload: () => refresh(true),
+  };
 }
 
 export function AccountShell({
@@ -109,7 +185,7 @@ export function AccountShell({
 }) {
   return (
     <div className="site-container py-10 md:py-14">
-      <div className="animate-rise">
+      <div>
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
           {eyebrow}
         </p>
@@ -122,7 +198,7 @@ export function AccountShell({
           </p>
         ) : null}
       </div>
-      <div className="mt-8 animate-rise-delay">{children}</div>
+      <div className="mt-8">{children}</div>
     </div>
   );
 }
