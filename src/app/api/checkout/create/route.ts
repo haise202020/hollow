@@ -16,9 +16,12 @@ import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
 import { sanitizeText, sanitizeUsername } from "@/lib/security/sanitize";
 
 const bodySchema = z.object({
-  type: z.enum(["robux", "gamepass"]),
+  type: z.enum(["robux", "gamepass", "custom_gamepass"]),
   robuxAmount: z.number().optional(),
   gamepassId: z.string().optional(),
+  customGameName: z.string().min(2).max(80).optional(),
+  customGamepassName: z.string().min(2).max(80).optional(),
+  customAmountBrl: z.number().optional(),
   robloxUsername: z.string().min(3).max(20),
   robloxUserId: z.number().int().positive(),
   robloxGamepassId: z.number().int().positive().optional(),
@@ -58,22 +61,52 @@ export async function POST(request: Request) {
   }
 
   const raw = body as Record<string, unknown>;
+
+  const robuxAmountRaw =
+    raw.robuxAmount === undefined || raw.robuxAmount === null || raw.robuxAmount === ""
+      ? undefined
+      : Number(raw.robuxAmount);
+  const customAmountRaw =
+    raw.customAmountBrl === undefined ||
+    raw.customAmountBrl === null ||
+    raw.customAmountBrl === ""
+      ? undefined
+      : Number(raw.customAmountBrl);
+  const robloxGamepassIdRaw =
+    raw.robloxGamepassId === undefined ||
+    raw.robloxGamepassId === null ||
+    raw.robloxGamepassId === ""
+      ? undefined
+      : Number(raw.robloxGamepassId);
+
   const candidate = {
     type: raw.type,
     robuxAmount:
-      typeof raw.robuxAmount === "number"
-        ? raw.robuxAmount
-        : Number(raw.robuxAmount),
+      robuxAmountRaw !== undefined && Number.isFinite(robuxAmountRaw)
+        ? robuxAmountRaw
+        : undefined,
     gamepassId:
       typeof raw.gamepassId === "string"
         ? sanitizeText(raw.gamepassId, 40)
         : undefined,
+    customGameName:
+      typeof raw.customGameName === "string"
+        ? sanitizeText(raw.customGameName, 80)
+        : undefined,
+    customGamepassName:
+      typeof raw.customGamepassName === "string"
+        ? sanitizeText(raw.customGamepassName, 80)
+        : undefined,
+    customAmountBrl:
+      customAmountRaw !== undefined && Number.isFinite(customAmountRaw)
+        ? customAmountRaw
+        : undefined,
     robloxUsername: sanitizeUsername(raw.robloxUsername),
     robloxUserId: Number(raw.robloxUserId),
     robloxGamepassId:
-      raw.robloxGamepassId === undefined || raw.robloxGamepassId === null
-        ? undefined
-        : Number(raw.robloxGamepassId),
+      robloxGamepassIdRaw !== undefined && Number.isFinite(robloxGamepassIdRaw)
+        ? robloxGamepassIdRaw
+        : undefined,
   };
 
   const parsed = bodySchema.safeParse(candidate);
@@ -105,6 +138,9 @@ export async function POST(request: Request) {
     type: parsed.data.type,
     robuxAmount: parsed.data.robuxAmount,
     gamepassId: parsed.data.gamepassId,
+    customGameName: parsed.data.customGameName,
+    customGamepassName: parsed.data.customGamepassName,
+    customAmountBrl: parsed.data.customAmountBrl,
   });
 
   if (!item) {
@@ -172,6 +208,8 @@ export async function POST(request: Request) {
       amountBrl: item.amountBrl,
       robuxAmount: item.robuxAmount,
       gamepassId: item.gamepassId,
+      customGameName: item.customGameName,
+      customGamepassName: item.customGamepassName,
       robloxGamepassId: verifiedGamepassId,
       robloxUserId: profile.id,
       robloxUsername: profile.name,

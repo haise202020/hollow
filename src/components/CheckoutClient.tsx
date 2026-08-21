@@ -6,7 +6,7 @@ import { gamepassPriceForNetRobux } from "@/lib/data/catalog";
 import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/security/constants";
 import { BasketIcon, BoltIcon, LockIcon, ShieldIcon } from "./icons";
 
-type CheckoutType = "robux" | "gamepass";
+type CheckoutType = "robux" | "gamepass" | "custom_gamepass";
 
 type CheckoutOrder = {
   id: string;
@@ -48,24 +48,45 @@ type Step =
   | "paid"
   | "error";
 
-const CHECKOUT_STEPS = [
+const CHECKOUT_STEPS_ROBUX = [
   { id: 1, label: "Conta" },
   { id: 2, label: "Gamepass" },
   { id: 3, label: "Pagamento" },
   { id: 4, label: "Concluído" },
 ] as const;
 
-function activeStepNumber(step: Step): number {
-  if (step === "paid") return 4;
-  if (step === "loading" || step === "pix") return 3;
-  if (step === "gamepass") return 2;
+const CHECKOUT_STEPS_PRODUCT = [
+  { id: 1, label: "Conta" },
+  { id: 2, label: "Pagamento" },
+  { id: 3, label: "Concluído" },
+] as const;
+
+function activeStepNumber(step: Step, type: CheckoutType): number {
+  if (type === "robux") {
+    if (step === "paid") return 4;
+    if (step === "loading" || step === "pix") return 3;
+    if (step === "gamepass") return 2;
+    return 1;
+  }
+
+  if (step === "paid") return 3;
+  if (step === "loading" || step === "pix") return 2;
   return 1;
 }
 
-function CheckoutSteps({ current }: { current: number }) {
+function CheckoutSteps({
+  current,
+  type,
+}: {
+  current: number;
+  type: CheckoutType;
+}) {
+  const steps =
+    type === "robux" ? CHECKOUT_STEPS_ROBUX : CHECKOUT_STEPS_PRODUCT;
+
   return (
     <ol className="mb-8 flex items-center justify-center gap-2 sm:gap-3">
-      {CHECKOUT_STEPS.map((item, index) => {
+      {steps.map((item, index) => {
         const done = item.id < current;
         const active = item.id === current;
         return (
@@ -90,7 +111,7 @@ function CheckoutSteps({ current }: { current: number }) {
                 {item.label}
               </span>
             </div>
-            {index < CHECKOUT_STEPS.length - 1 ? (
+            {index < steps.length - 1 ? (
               <div
                 className={`mb-5 h-px w-6 sm:w-10 ${
                   done ? "bg-[var(--purple)]" : "bg-white/10"
@@ -109,6 +130,8 @@ type Props = {
   type: CheckoutType;
   robuxAmount?: number;
   gamepassId?: string;
+  customGameName?: string;
+  customGamepassName?: string;
   amountBrl: number;
   productLabel: string;
   image?: string;
@@ -127,6 +150,8 @@ export function CheckoutClient({
   type,
   robuxAmount,
   gamepassId,
+  customGameName,
+  customGamepassName,
   amountBrl,
   productLabel,
   image,
@@ -334,11 +359,20 @@ export function CheckoutClient({
         },
         body: JSON.stringify({
           type,
-          robuxAmount,
-          gamepassId,
+          ...(type === "robux" && robuxAmount != null ? { robuxAmount } : {}),
+          ...(type === "gamepass" && gamepassId ? { gamepassId } : {}),
+          ...(type === "custom_gamepass"
+            ? {
+                customGameName,
+                customGamepassName,
+                customAmountBrl: amountBrl,
+              }
+            : {}),
           robloxUsername: profile.name,
           robloxUserId: profile.id,
-          robloxGamepassId: gamepassRobloxId,
+          ...(gamepassRobloxId != null
+            ? { robloxGamepassId: gamepassRobloxId }
+            : {}),
         }),
       });
 
@@ -372,7 +406,7 @@ export function CheckoutClient({
     }
   }
 
-  const currentStep = activeStepNumber(step);
+  const currentStep = activeStepNumber(step, type);
 
   if (step === "paid" && order) {
     const adminStatus = order.adminStatus ?? "AGUARDANDO";
@@ -382,7 +416,7 @@ export function CheckoutClient({
 
     return (
       <div>
-        <CheckoutSteps current={currentStep} />
+        <CheckoutSteps current={currentStep} type={type} />
         <div className="mx-auto max-w-xl rounded-3xl border border-white/[0.02] bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.2),transparent_55%),#0c0c12] px-6 py-10 text-center md:px-10">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
             {isRejected
@@ -447,7 +481,7 @@ export function CheckoutClient({
   if (step === "username" || (step === "error" && !profile)) {
     return (
       <div>
-        <CheckoutSteps current={currentStep} />
+        <CheckoutSteps current={currentStep} type={type} />
         <section className="mx-auto w-full max-w-lg rounded-3xl border border-white/[0.02] bg-[#0c0c12] p-6 text-center transition duration-200 hover:scale-[1.02] md:p-10">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
             Etapa 1
@@ -513,7 +547,7 @@ export function CheckoutClient({
   if (step === "confirm" && profile) {
     return (
       <div>
-        <CheckoutSteps current={currentStep} />
+        <CheckoutSteps current={currentStep} type={type} />
         <section className="mx-auto w-full max-w-lg rounded-3xl border border-white/[0.02] bg-[#0c0c12] p-6 transition duration-200 hover:scale-[1.02] md:p-10">
           <p className="text-center text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
             Etapa 1
@@ -621,7 +655,7 @@ export function CheckoutClient({
   ) {
     return (
       <div className="select-none" onDragStart={(e) => e.preventDefault()}>
-        <CheckoutSteps current={currentStep} />
+        <CheckoutSteps current={currentStep} type={type} />
         <div className="mx-auto grid max-w-5xl select-none gap-5 lg:grid-cols-[1.45fr_0.9fr] lg:items-start">
           <section className="rounded-2xl border border-white/[0.02] bg-[#09090d] p-5 transition duration-200 hover:scale-[1.01] md:p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
@@ -808,7 +842,7 @@ export function CheckoutClient({
 
   return (
     <div>
-      <CheckoutSteps current={currentStep} />
+      <CheckoutSteps current={currentStep} type={type} />
 
       {step === "pix" && order ? (
         <div

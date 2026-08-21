@@ -99,6 +99,19 @@ export function buildOrderEmbed(order: Order) {
     });
   }
 
+  if (order.customGameName || order.customGamepassName) {
+    fields.push({
+      name: "Jogo solicitado",
+      value: order.customGameName ?? "—",
+      inline: true,
+    });
+    fields.push({
+      name: "Gamepass solicitada",
+      value: order.customGamepassName ?? "—",
+      inline: true,
+    });
+  }
+
   if (order.approvedBy) {
     fields.push({
       name: "Responsável",
@@ -157,7 +170,7 @@ export function buildDeliveryEmbed(order: Order) {
       inline: true,
     },
     { name: "Produto", value: order.productLabel, inline: true },
-    { name: "Tipo", value: order.type === "robux" ? "Robux" : "Gamepass", inline: true },
+    { name: "Tipo", value: order.type === "robux" ? "Robux" : order.type === "custom_gamepass" ? "Gamepass personalizada" : "Gamepass", inline: true },
     { name: "Valor pago", value: formatBrl(order.amountBrl), inline: true },
   ];
 
@@ -186,6 +199,19 @@ export function buildDeliveryEmbed(order: Order) {
     fields.push({
       name: "Catalog ID",
       value: order.gamepassId,
+      inline: true,
+    });
+  }
+
+  if (order.customGameName || order.customGamepassName) {
+    fields.push({
+      name: "Jogo solicitado",
+      value: order.customGameName ?? "—",
+      inline: true,
+    });
+    fields.push({
+      name: "Gamepass solicitada",
+      value: order.customGamepassName ?? "—",
       inline: true,
     });
   }

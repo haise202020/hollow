@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckoutClient } from "@/components/CheckoutClient";
-import { hotItems, robuxToBrl, ROBUX_MAX, ROBUX_MIN, ROBUX_STEP } from "@/lib/data/catalog";
+import {
+  hotItems,
+  robuxToBrl,
+  ROBUX_MAX,
+  ROBUX_MIN,
+  ROBUX_STEP,
+} from "@/lib/data/catalog";
+import {
+  CUSTOM_GAMEPASS_MAX_BRL,
+  CUSTOM_GAMEPASS_MIN_BRL,
+} from "@/lib/orders/pricing";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -76,6 +86,45 @@ export default async function CheckoutPage({
           amountBrl={item.priceBrl}
           productLabel={`${item.name} (${item.game})`}
           image={item.image}
+        />
+      </div>
+    );
+  }
+
+  if (type === "custom_gamepass") {
+    const gameName = (first(params.game) ?? "").trim();
+    const passName = (first(params.name) ?? "").trim();
+    const amountBrl =
+      Math.round(Number(first(params.amount) ?? first(params.price)) * 100) /
+      100;
+
+    const valid =
+      gameName.length >= 2 &&
+      gameName.length <= 80 &&
+      passName.length >= 2 &&
+      passName.length <= 80 &&
+      Number.isFinite(amountBrl) &&
+      amountBrl >= CUSTOM_GAMEPASS_MIN_BRL &&
+      amountBrl <= CUSTOM_GAMEPASS_MAX_BRL;
+
+    if (!valid) {
+      return (
+        <InvalidCheckout
+          message="Dados da gamepass personalizada inválidos."
+          href="/gamepasses/personalizada"
+          action="Preencher novamente"
+        />
+      );
+    }
+
+    return (
+      <div className="site-container py-12 md:py-16">
+        <CheckoutClient
+          type="custom_gamepass"
+          customGameName={gameName}
+          customGamepassName={passName}
+          amountBrl={amountBrl}
+          productLabel={`${passName} (${gameName})`}
         />
       </div>
     );
