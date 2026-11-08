@@ -147,7 +147,7 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#07070a]/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-[80] border-b border-white/[0.06] bg-[#07070a] backdrop-blur-xl">
       <div className="site-container relative flex h-[72px] items-center justify-between md:h-20">
         <Link
           href="/"

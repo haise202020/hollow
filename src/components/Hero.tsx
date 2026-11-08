@@ -6,7 +6,7 @@ const HERO_IMAGE = "/hero-mascote-v2.webp";
 
 export function Hero() {
   return (
-    <section className="site-container relative grid items-center gap-10 py-12 md:grid-cols-2 md:gap-8 md:py-20 lg:py-24">
+    <section className="site-container relative z-0 grid items-center gap-10 py-12 md:grid-cols-2 md:gap-8 md:py-20 lg:py-24">
       {/* Ambient glow — subtle, not overwhelming */}
       <div
         aria-hidden
@@ -50,14 +50,14 @@ export function Hero() {
         </p>
       </div>
 
-      <div className="relative z-50 mx-auto w-full max-w-[2050px] md:max-w-none">
-        <div className="relative aspect-[1359/1158]">
+      <div className="relative z-0 mx-auto min-w-0 w-full max-w-[640px]">
+        <div className="relative aspect-[1359/1158] overflow-hidden">
           <Image
             src={HERO_IMAGE}
             alt="Mascotes Hollow no Roblox"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 2050px"
+            sizes="(max-width: 768px) 100vw, 640px"
             className="object-contain object-center"
           />
         </div>

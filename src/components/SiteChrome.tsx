@@ -12,7 +12,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!bare ? <Header /> : null}
-      <main className="flex-1">{children}</main>
+      <main className="relative z-0 flex-1">{children}</main>
       {!bare ? <Footer /> : null}
       {!bare ? <ChatWidget /> : null}
     </>
