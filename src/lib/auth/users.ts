@@ -69,17 +69,17 @@ export async function createUserWithPassword(input: {
   const col = await users();
   const now = new Date().toISOString();
 
+  // Omitir discordId/discordUsername quando null para evitar colisão
+  // com índice único não-sparse no MongoDB Atlas (E11000 dup key: { discordId: null })
   const doc: UserDocument = {
     id: `usr_${randomUUID().replace(/-/g, "").slice(0, 16)}`,
     username,
     email: input.email?.toLowerCase() || null,
     passwordHash: input.passwordHash,
-    discordId: null,
-    discordUsername: null,
     avatarUrl: null,
     createdAt: now,
     updatedAt: now,
-  };
+  } as UserDocument;
 
   try {
     await col.insertOne(doc);

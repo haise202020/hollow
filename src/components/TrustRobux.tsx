@@ -3,60 +3,51 @@ import { CheckIcon, ClockIcon } from "./icons";
 
 export function TrustRobux() {
   return (
-    <section className="site-container mt-[0.5cm] pb-14 pt-0 md:pb-20">
-      <div className="grid items-center gap-10 md:grid-cols-[1.05fr_0.95fr] md:gap-10 lg:gap-12">
-        <div className="relative mx-auto w-full max-w-[560px] aspect-[3/4] -translate-x-[1cm] overflow-visible md:max-w-none">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/12 blur-2xl"
-          />
+    <section className="site-container py-16 md:py-24">
+      <div className="grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div className="relative mx-auto w-full max-w-[480px] md:max-w-none">
           <Image
             src="/photos/6.png"
             alt="Mascote Hollow"
-            fill
-            sizes="(max-width: 768px) 90vw, 560px"
-            className="relative z-[1] object-contain object-center"
-            priority
+            width={480}
+            height={640}
+            className="w-full object-contain"
           />
         </div>
 
         <div>
-          <h2 className="font-display text-3xl font-bold leading-tight text-white md:text-4xl lg:text-[2.75rem]">
-            Os robux aqui são{" "}
-            <span className="text-[var(--purple-bright)]">confiáveis</span>{" "}
-            mesmo?
+          <h2 className="font-display text-3xl font-bold leading-tight text-white md:text-4xl">
+            Compra transparente,{" "}
+            <span className="text-[var(--secondary)]">entrega garantida.</span>
           </h2>
 
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--fg-muted)] md:text-lg">
-            Sim. Na Hollow você compra com transparência: preço claro, taxa de
-            30% já coberta no cálculo e entrega feita com segurança — sem pedir
-            a senha da sua conta Roblox.
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-[var(--fg-muted)]">
+            Preço claro, taxa de 30% já inclusa no cálculo e entrega segura —
+            sem pedir senha da sua conta Roblox.
           </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <article className="p-5">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+            <article className="rounded-xl border border-white/[0.06] bg-[var(--bg-panel)] p-6">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--secondary)]/15 text-[var(--secondary)]">
                 <CheckIcon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 font-display text-lg font-bold text-white">
-                Compra segura
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">
+                Sem acesso à conta
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-                Processo protegido, sem acesso à sua conta. Você só informa o
-                necessário para a entrega.
+                Você só informa o username. Nada de senha ou dados sensíveis.
               </p>
             </article>
 
-            <article className="p-5">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--purple)]/20 text-[var(--purple-bright)]">
+            <article className="rounded-xl border border-white/[0.06] bg-[var(--bg-panel)] p-6">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
                 <ClockIcon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 font-display text-lg font-bold text-white">
-                Entrega rápida
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">
+                Suporte em português
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-                Pedidos de Robux e gamepasses com acompanhamento e suporte
-                humano em português.
+                Acompanhamento do pedido e ajuda rápida quando precisar.
               </p>
             </article>
           </div>

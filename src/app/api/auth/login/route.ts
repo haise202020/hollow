@@ -8,7 +8,14 @@ import {
 import { resolveDisplayName } from "@/lib/auth/types";
 import { findUserByUsername } from "@/lib/auth/users";
 import { assertCsrf, CSRF_COOKIE } from "@/lib/security/csrf-core";
-import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
+import { ensureCsrfCookie } from "@/lib/security/csrf";
+import {
+  clearAuthFailures,
+  getAuthBackoffMs,
+  getClientIp,
+  rateLimit,
+  recordAuthFailure,
+} from "@/lib/security/rate-limit";
 import { sanitizeText } from "@/lib/security/sanitize";
 
 const bodySchema = z.object({
@@ -34,7 +41,11 @@ export async function POST(request: Request) {
     ?.split("=")[1];
 
   if (!(await assertCsrf(request, cookieToken))) {
-    return NextResponse.json({ error: "Token CSRF inválido." }, { status: 403 });
+    await ensureCsrfCookie();
+    return NextResponse.json(
+      { error: "Token CSRF expirado. Tente novamente." },
+      { status: 419 },
+    );
   }
 
   let body: unknown;
@@ -54,9 +65,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
   }
 
+  // Apply progressive backoff for repeated failures from this IP+username
+  const authKey = `login:${ip}:${parsed.data.username.toLowerCase()}`;
+  const backoffMs = getAuthBackoffMs(authKey);
+  if (backoffMs > 0) {
+    await new Promise((resolve) => setTimeout(resolve, Math.min(backoffMs, 5000)));
+  }
+
   try {
     const user = await findUserByUsername(parsed.data.username);
     if (!user?.passwordHash) {
+      recordAuthFailure(authKey);
       return NextResponse.json(
         { error: "Usuário ou senha incorretos." },
         { status: 401 },
@@ -65,11 +84,15 @@ export async function POST(request: Request) {
 
     const ok = await verifyPassword(parsed.data.password, user.passwordHash);
     if (!ok) {
+      recordAuthFailure(authKey);
       return NextResponse.json(
         { error: "Usuário ou senha incorretos." },
         { status: 401 },
       );
     }
+
+    // Clear failure counter on successful login
+    clearAuthFailures(authKey);
 
     const publicUser = {
       id: user.id,

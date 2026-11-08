@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { apiError } from "@/lib/api/response";
 import { getSession } from "@/lib/auth/session";
 import { formatBrl, gamepassPriceForNetRobux } from "@/lib/data/catalog";
 import { resolveCheckoutItem } from "@/lib/orders/pricing";
-import { createOrderId, createOrderViewToken, saveOrder } from "@/lib/orders/store";
+import { createOrderId, createOrderViewToken, findRecentPendingOrder, saveOrder } from "@/lib/orders/store";
 import type { Order } from "@/lib/orders/types";
 import {
   createPixTransaction,
   normalizePaymentStatus,
-} from "@/lib/payments/misticpay";
+} from "@/lib/payments/sevenpay";
 import { findMatchingGamepass } from "@/lib/roblox/gamepasses";
 import { gatewayPayerFromUsername, lookupRobloxUser } from "@/lib/roblox/lookup";
 import { assertCsrf, CSRF_COOKIE } from "@/lib/security/csrf-core";
+import { ensureCsrfCookie } from "@/lib/security/csrf";
 import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
 import { sanitizeText, sanitizeUsername } from "@/lib/security/sanitize";
 
@@ -46,7 +48,14 @@ export async function POST(request: Request) {
     ?.split("=")[1];
 
   if (!(await assertCsrf(request, cookieToken))) {
-    return NextResponse.json({ error: "Token CSRF inválido." }, { status: 403 });
+    // Token inválido (ex: CSRF_SECRET trocado após atualização do .env.local).
+    // Em vez de bloquear com 403, emitir novo cookie e pedir ao frontend para
+    // reenviar a requisição com o token fresco.
+    await ensureCsrfCookie();
+    return NextResponse.json(
+      { error: "Token CSRF expirado. Tente novamente." },
+      { status: 419 },
+    );
   }
 
   let body: unknown;
@@ -111,10 +120,9 @@ export async function POST(request: Request) {
 
   const parsed = bodySchema.safeParse(candidate);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Dados inválidos.", details: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return apiError("Dados inválidos.", 400, {
+      details: parsed.error.flatten(),
+    });
   }
 
   let profile;
@@ -219,7 +227,7 @@ export async function POST(request: Request) {
       payerDocument: gatewayPayer.payerDocument,
       status: normalizePaymentStatus(pix.transactionState),
       adminStatus: "AGUARDANDO",
-      misticTransactionId: pix.transactionId,
+      transactionId: pix.transactionId,
       copyPaste: pix.copyPaste,
       qrCodeBase64: pix.qrCodeBase64,
       qrcodeUrl: pix.qrcodeUrl,
@@ -252,6 +260,45 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    // Fallback para erro 409 da SevenPay (Idempotency-Key já reservada):
+    // recupera o pedido pendente recente do mesmo usuário/valor em vez de falhar.
+    const errMsg = error instanceof Error ? error.message : "";
+    if (errMsg.includes("Idempotency-Key") || errMsg.includes("reservado")) {
+      console.log("[checkout] Erro 409 detectado, buscando pedido pendente recente como fallback", {
+        accountUserId: session?.sub,
+        amountBrl: item.amountBrl,
+      });
+
+      const existing = session?.sub
+        ? await findRecentPendingOrder(session.sub, item.amountBrl)
+        : null;
+
+      if (existing && existing.copyPaste) {
+        console.log("[checkout] Fallback 409: recuperando pedido existente", {
+          orderId: existing.id,
+          transactionId: existing.transactionId,
+        });
+
+        return NextResponse.json({
+          ok: true,
+          reused: true,
+          order: {
+            id: existing.id,
+            status: existing.status,
+            adminStatus: existing.adminStatus,
+            productLabel: existing.productLabel,
+            amountBrl: existing.amountBrl,
+            amountFormatted: formatBrl(existing.amountBrl),
+            robloxUsername: existing.robloxUsername,
+            copyPaste: existing.copyPaste,
+            qrCodeBase64: existing.qrCodeBase64,
+            qrcodeUrl: existing.qrcodeUrl,
+            viewToken: existing.viewToken,
+          },
+        });
+      }
+    }
+
     const message =
       error instanceof Error
         ? error.message

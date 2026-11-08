@@ -1,4 +1,15 @@
-export { CSRF_COOKIE, CSRF_HEADER } from "./constants";
+import { CSRF_COOKIE, CSRF_HEADER } from "./constants";
+export { CSRF_COOKIE, CSRF_HEADER };
+
+/** Extract the CSRF cookie value from request headers without duplication. */
+export function getCsrfCookieFromHeaders(headers: Headers): string | undefined {
+  const cookieHeader = headers.get("cookie") ?? "";
+  return cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
+    ?.split("=")[1];
+}
 
 function getSecret(): string {
   const secret = process.env.CSRF_SECRET;

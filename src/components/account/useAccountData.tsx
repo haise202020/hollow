@@ -43,7 +43,7 @@ export type AccountUser = {
 export const TONE_STYLES: Record<StatusTone, string> = {
   pending: "border-amber-400/25 bg-amber-500/10 text-amber-200",
   paid: "border-sky-400/25 bg-sky-500/10 text-sky-200",
-  approved: "border-emerald-400/25 bg-emerald-500/10 text-emerald-200",
+  approved: "border-purple-400/25 bg-purple-500/10 text-purple-200",
   rejected: "border-red-400/25 bg-red-500/10 text-red-200",
   failed: "border-red-400/25 bg-red-500/10 text-red-200",
 };
@@ -186,7 +186,7 @@ export function AccountShell({
   return (
     <div className="site-container py-10 md:py-14">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--accent-bright)]">
           {eyebrow}
         </p>
         <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-white md:text-4xl">

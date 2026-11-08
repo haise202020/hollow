@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { apiError } from "@/lib/api/response";
 import { isReservedUsername } from "@/lib/auth/types";
 import { hashPassword } from "@/lib/auth/password";
 import {
@@ -8,6 +9,7 @@ import {
 } from "@/lib/auth/session";
 import { createUserWithPassword } from "@/lib/auth/users";
 import { assertCsrf, CSRF_COOKIE } from "@/lib/security/csrf-core";
+import { ensureCsrfCookie } from "@/lib/security/csrf";
 import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
 import { sanitizeText } from "@/lib/security/sanitize";
 
@@ -39,7 +41,11 @@ export async function POST(request: Request) {
     ?.split("=")[1];
 
   if (!(await assertCsrf(request, cookieToken))) {
-    return NextResponse.json({ error: "Token CSRF inválido." }, { status: 403 });
+    await ensureCsrfCookie();
+    return NextResponse.json(
+      { error: "Token CSRF expirado. Tente novamente." },
+      { status: 419 },
+    );
   }
 
   let body: unknown;
@@ -61,10 +67,9 @@ export async function POST(request: Request) {
   });
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Dados inválidos.", details: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return apiError("Dados inválidos.", 400, {
+      details: parsed.error.flatten(),
+    });
   }
 
   if (isReservedUsername(parsed.data.username)) {

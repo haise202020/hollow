@@ -2,63 +2,63 @@ import Image from "next/image";
 import Link from "next/link";
 import { CartIcon } from "./icons";
 
-const HERO_IMAGE = "https://i.imgur.com/myqa092.png";
+const HERO_IMAGE = "/hero-mascote-v2.webp";
 
 export function Hero() {
   return (
-    <section className="site-container grid items-center gap-10 py-10 md:grid-cols-2 md:gap-8 md:py-16 lg:py-20">
-      <div className="animate-rise">
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-[var(--purple-bright)]">
-          Melhor preço do Brasil
-        </p>
+    <section className="site-container relative grid items-center gap-10 py-12 md:grid-cols-2 md:gap-8 md:py-20 lg:py-24">
+      {/* Ambient glow — subtle, not overwhelming */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 right-0 h-[500px] w-[500px] rounded-full opacity-40 blur-[120px]"
+        style={{
+          background:
+            "radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)",
+        }}
+      />
 
-        <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
-          Compre{" "}
-          <span className="text-[var(--purple-bright)]">Robux</span> e{" "}
-          <span className="text-[var(--purple-bright)]">Gamepasses</span> com
-          entrega segura.
+      <div className="relative z-10">
+        <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
+          Robux e Gamepasses{" "}
+          <span className="text-[var(--accent)]">sem complicação.</span>
         </h1>
 
-        <p className="mt-5 max-w-md text-base leading-relaxed text-[var(--fg-muted)] md:text-lg">
-          A Hollow entrega Robux barato e gamepasses dos seus jogos favoritos no
-          Roblox — rápido, seguro e com suporte humano.
+        <p className="mt-6 max-w-lg text-lg leading-relaxed text-[var(--fg-muted)]">
+          Entrega rápida, preço justo e suporte de verdade. Sua compra na Hollow
+          é simples: escolheu, pagou, recebeu.
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <div className="mt-10 flex flex-wrap items-center gap-4">
           <Link
             href="/robux"
-            className="btn-pulse inline-flex items-center gap-2 rounded-xl bg-[var(--purple)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--purple-bright)]"
+            className="group inline-flex items-center gap-2.5 rounded-lg bg-[var(--accent)] px-6 py-3.5 text-sm font-semibold text-[#08090d] transition-all hover:bg-[var(--accent-bright)] hover:shadow-[0_0_24px_var(--accent-glow)]"
           >
-            <CartIcon className="h-4 w-4" />
-            Comprar agora
+            <CartIcon className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
+            Comprar Robux
           </Link>
           <Link
             href="/gamepasses"
-            className="inline-flex items-center rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-[var(--purple)] hover:text-[var(--purple-bright)]"
+            className="inline-flex items-center rounded-lg border border-white/10 bg-white/[0.03] px-6 py-3.5 text-sm font-semibold text-white transition hover:border-[var(--accent)]/50 hover:bg-white/[0.06]"
           >
             Ver gamepasses
           </Link>
         </div>
+
+        {/* Social proof line — earns trust without shouting */}
+        <p className="mt-8 text-sm text-[var(--fg-muted)]">
+          Milhares de entregas realizadas · Suporte em português · Sem senha
+        </p>
       </div>
 
-      <div className="relative animate-rise-delay mx-auto w-full max-w-[720px] translate-x-[1cm] md:max-w-none md:scale-[1.045] lg:scale-[1.19]">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(139, 92, 246, 0.16) 42%, transparent 70%)",
-          }}
-        />
-
-        <div className="relative aspect-square">
+      <div className="relative z-50 mx-auto w-full max-w-[2050px] md:max-w-none">
+        <div className="relative aspect-[1359/1158]">
           <Image
             src={HERO_IMAGE}
             alt="Mascotes Hollow no Roblox"
             fill
             priority
-            sizes="(max-width: 768px) 95vw, 720px"
-            className="object-contain object-center drop-shadow-[0_20px_60px_rgba(139,92,246,0.25)]"
+            sizes="(max-width: 768px) 100vw, 2050px"
+            className="object-contain object-center"
           />
         </div>
       </div>

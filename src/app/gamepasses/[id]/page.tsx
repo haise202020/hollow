@@ -32,7 +32,7 @@ function SimilarCard({ item }: { item: Gamepass }) {
   return (
     <Link
       href={`/gamepasses/${item.id}`}
-      className="relative z-0 flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#121218] transition duration-200 hover:z-10 hover:scale-[1.03] hover:border-[var(--purple)]"
+      className="relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#121218] transition duration-200 hover:scale-[1.03] hover:border-[var(--accent)]"
     >
       <div className="relative aspect-video w-full bg-[#0d0d12]">
         <Image
@@ -78,7 +78,7 @@ export default async function GamepassProductPage({
           ← Voltar para gamepasses
         </Link>
 
-        <section className="rounded-[24px] border border-[var(--purple)]/25 bg-[#111118]/92 p-4 shadow-[0_0_70px_rgba(139,92,246,0.18)] md:p-5">
+        <section className="rounded-[24px] border border-[var(--accent)]/25 bg-[#111118]/92 p-4 shadow-[0_0_70px_rgba(139,92,246,0.18)] md:p-5">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-6">
             {/* Imagem — ocupa o espaço restante e fica em destaque */}
             <div className="relative isolate min-w-0 w-full flex-1">
@@ -86,7 +86,7 @@ export default async function GamepassProductPage({
                 aria-hidden
                 className="pointer-events-none absolute -inset-2 -z-10 rounded-[22px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.35),transparent_70%)] blur-md"
               />
-              <div className="relative aspect-video w-full overflow-hidden rounded-[18px] border border-[var(--purple)]/35 bg-[#0a0a10] shadow-[0_8px_36px_rgba(139,92,246,0.28)]">
+              <div className="relative aspect-video w-full overflow-hidden rounded-[18px] border border-[var(--accent)]/35 bg-[#0a0a10] shadow-[0_8px_36px_rgba(139,92,246,0.28)]">
                 <Image
                   src={item.image}
                   alt={item.name}
@@ -100,7 +100,7 @@ export default async function GamepassProductPage({
 
             {/* Infos — só a largura necessária, sem área vazia */}
             <div className="flex w-full shrink-0 flex-col justify-center lg:w-[320px] xl:w-[340px]">
-              <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+              <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-[var(--accent-bright)]">
                 {item.game} · {categoryLabel}
               </p>
 
@@ -152,7 +152,7 @@ export default async function GamepassProductPage({
 
               <Link
                 href={`/checkout?type=gamepass&id=${item.id}`}
-                className="mt-6 inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-[12px] bg-[var(--purple)] text-[15px] font-bold text-white transition hover:bg-[var(--purple-bright)]"
+                className="mt-6 inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-[12px] bg-[var(--accent)] text-[15px] font-bold text-white transition hover:bg-[var(--accent-bright)]"
               >
                 <BasketIcon className="h-4 w-4" />
                 Comprar agora
@@ -162,7 +162,7 @@ export default async function GamepassProductPage({
         </section>
 
         <section className="mt-4 rounded-[24px] border border-white/[0.08] bg-[#111118]/92 p-5 md:mt-5 md:p-7">
-          <h2 className="font-display text-[20px] font-bold text-[var(--purple-bright)]">
+          <h2 className="font-display text-[20px] font-bold text-[var(--accent-bright)]">
             Descrição
           </h2>
 
@@ -214,7 +214,7 @@ export default async function GamepassProductPage({
               </h2>
               <Link
                 href="/gamepasses"
-                className="shrink-0 text-[14px] text-[var(--purple-bright)] transition hover:text-white"
+                className="shrink-0 text-[14px] text-[var(--accent-bright)] transition hover:text-white"
               >
                 Ver todos
               </Link>

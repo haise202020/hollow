@@ -9,7 +9,7 @@ import {
 import {
   checkPixTransaction,
   normalizePaymentStatus,
-} from "@/lib/payments/misticpay";
+} from "@/lib/payments/sevenpay";
 import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
 import { sanitizeText } from "@/lib/security/sanitize";
 
@@ -54,9 +54,9 @@ export async function GET(request: Request) {
 
   let fresh = order;
 
-  if (order.status === "PENDENTE" && order.misticTransactionId) {
+  if (order.status === "PENDENTE" && order.transactionId) {
     try {
-      const checked = await checkPixTransaction(order.misticTransactionId);
+      const checked = await checkPixTransaction(order.transactionId);
       const nextStatus = normalizePaymentStatus(checked.transactionState);
 
       if (

@@ -1,34 +1,24 @@
 # Hollow
 
-Loja de **Robux** e **Gamepasses** do Roblox — Next.js, tema preto/branco com destaques roxos e base de segurança pronta para evoluir.
+Loja de Robux e gamepasses do Roblox. Next.js, login com Discord, checkout Pix, pedidos no MongoDB e avisos no Discord.
 
-## Desenvolvimento
+## Como rodar
 
 ```bash
 npm install
+copy .env.example .env.local
 npm run dev
 ```
 
 Abra [http://localhost:3000](http://localhost:3000).
 
-## Segurança (já incluída)
+Preencha `.env.local` com os valores reais. O arquivo `.env.example` lista todas as variáveis. Não commite `.env`, `.env.local` nem chaves.
 
-- Headers: CSP, `X-Frame-Options`, `nosniff`, Referrer-Policy, Permissions-Policy, HSTS (produção)
-- `poweredByHeader` desligado
-- Middleware com rate limit global e cookie CSRF
-- API `/api/contact` com CSRF, sanitização, validação Zod e rate limit por IP
-- Imagens remotas restritas a `i.imgur.com`
-- Sem `dangerouslySetInnerHTML`
+Em produção, `CSRF_SECRET` e `AUTH_SECRET` precisam ter pelo menos 32 caracteres.
 
-Em produção, defina um segredo forte:
+## Scripts
 
-```bash
-# .env.local
-CSRF_SECRET=gere_com_openssl_rand_hex_32
-```
-
-## Próximos passos
-
-- Banco de dados e autenticação real do Login
-- Checkout / gateway de pagamento
-- Rate limit distribuído (Redis/Upstash) em multi-instância
+- `npm run dev` — desenvolvimento
+- `npm run build` — build de produção
+- `npm run start` — sobe o build
+- `npm run lint` — ESLint

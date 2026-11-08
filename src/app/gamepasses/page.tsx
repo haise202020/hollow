@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 function ProductCard({ item }: { item: Gamepass }) {
   return (
-    <article className="relative z-0 flex flex-col overflow-hidden rounded-2xl border-2 border-[#2a2a32] bg-[#121218] transition duration-200 hover:z-10 hover:scale-[1.04] hover:border-[var(--purple)]">
+    <article className="relative flex flex-col overflow-hidden rounded-2xl border-2 border-[#2a2a32] bg-[#121218] transition duration-200 hover:scale-[1.04] hover:border-[var(--accent)]">
       <div className="relative aspect-video bg-[#0d0d12]">
         <Image
           src={item.image}
@@ -43,7 +43,7 @@ function ProductCard({ item }: { item: Gamepass }) {
 
         <Link
           href={`/gamepasses/${item.id}`}
-          className="mt-3.5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--purple)] px-3 py-2.5 text-[13px] font-bold text-white transition hover:bg-[var(--purple-bright)]"
+          className="mt-3.5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-3 py-2.5 text-[13px] font-bold text-white transition hover:bg-[var(--accent-bright)]"
         >
           <BasketIcon className="h-4 w-4" />
           Comprar agora
@@ -92,7 +92,7 @@ export default function GamepassesPage() {
         style={{ zoom: 1.1 }}
       >
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-medium uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+          <p className="text-sm font-medium uppercase tracking-[0.14em] text-[var(--accent-bright)]">
             Blox Fruits
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold text-white md:text-4xl">
@@ -126,7 +126,7 @@ export default function GamepassesPage() {
             </p>
             <Link
               href="/gamepasses/personalizada"
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--purple)] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--purple-bright)]"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--accent-bright)]"
             >
               Pedir gamepass personalizada
             </Link>

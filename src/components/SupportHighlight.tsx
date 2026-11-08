@@ -3,43 +3,41 @@ import { BoltIcon, ChatIcon } from "./icons";
 
 export function SupportHighlight() {
   return (
-    <section className="site-container relative z-10 -mt-[3.5cm] overflow-visible py-12 md:py-16">
+    <section className="site-container relative z-10 -mt-14 overflow-visible py-12 md:-mt-16 md:py-16">
       <div className="grid items-center gap-10 md:grid-cols-[1fr_1.1fr] md:gap-8 lg:gap-10">
         <div>
-          <h2 className="font-display text-3xl font-bold leading-tight text-white md:text-4xl lg:text-[2.75rem]">
-            Complicou? A gente{" "}
-            <span className="text-[var(--purple-bright)]">descomplica.</span>
+          <h2 className="font-display text-3xl font-bold leading-tight text-white md:text-4xl">
+            Precisa de ajuda?{" "}
+            <span className="text-[var(--secondary)]">Suporte real.</span>
           </h2>
 
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--fg-muted)] md:text-lg">
-            Nosso atendimento é pelo Discord: dúvidas sobre Robux, gamepasses
-            ou status do pedido são resolvidas com suporte humano em português.
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-[var(--fg-muted)]">
+            Atendimento pelo Discord com equipe em português. Dúvidas sobre
+            Robux, gamepasses ou status do pedido resolvidas de verdade.
           </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <article className="p-5">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            <article className="rounded-xl border border-white/[0.06] bg-[var(--bg-panel)] p-6">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--secondary)]/15 text-[var(--secondary)]">
                 <ChatIcon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 font-display text-lg font-bold text-white">
-                Suporte humano
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">
+                Equipe em português
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-                Fale com a equipe Hollow em português e resolva seu pedido com
-                clareza do início ao fim.
+                Fale direto com a equipe Hollow e resolva seu pedido com clareza.
               </p>
             </article>
 
-            <article className="p-5">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--purple)]/20 text-[var(--purple-bright)]">
+            <article className="rounded-xl border border-white/[0.06] bg-[var(--bg-panel)] p-6">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
                 <BoltIcon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 font-display text-lg font-bold text-white">
-                Resposta rápida
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">
+                Resposta ágil
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-                Dúvidas sobre entrega, taxa ou gamepass? A gente responde com
-                agilidade para você não perder tempo.
+                Dúvidas sobre entrega, taxa ou gamepass? Respondemos rápido.
               </p>
             </article>
           </div>
@@ -48,24 +46,20 @@ export function SupportHighlight() {
             href="https://discord.gg/hollowbux"
             target="_blank"
             rel="noreferrer"
-            className="mt-8 inline-flex text-sm font-semibold text-[var(--purple-bright)] transition hover:text-white"
+            className="mt-10 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-bright)]"
           >
-            Entrar no Discord →
+            Entrar no Discord
           </a>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[640px] translate-x-[1.5cm] overflow-visible md:max-w-none">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/12 blur-2xl"
-          />
+        <div className="relative mx-auto w-full max-w-[560px] md:max-w-none">
           <Image
             src="/photos/8.png"
             alt="Mascote Hollow do suporte"
             width={1411}
             height={1115}
-            sizes="(max-width: 768px) 95vw, 640px"
-            className="relative z-[1] h-auto w-full object-contain"
+            sizes="(max-width: 768px) 90vw, 560px"
+            className="h-auto w-full object-contain"
             priority
           />
         </div>

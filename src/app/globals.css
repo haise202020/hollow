@@ -1,18 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #07070a;
-  --bg-elevated: #101014;
-  --bg-panel: #15151c;
-  --bg-soft: #1b1b24;
-  --fg: #f4f4f7;
-  --fg-muted: #9a9aab;
-  --line: rgba(255, 255, 255, 0.08);
-  --purple: #8b5cf6;
-  --purple-bright: #a78bfa;
-  --purple-deep: #6d28d9;
-  --purple-glow: rgba(139, 92, 246, 0.35);
-}
+  /* Hollow Gaming Palette — Purple on Deep Charcoal */
+  --bg: #08090d;
+  --bg-elevated: #0f1117;
+  --bg-panel: #14161e;
+  --bg-soft: #1a1d28;
+  --fg: #eef0f6;
+  --fg-muted: #8b90a5;
+  --line: rgba(255, 255, 255, 0.06);
+
+  /* Primary accent: Electric purple — energetic, digital, gaming-native */
+  --accent: #a855f7;
+  --accent-bright: #c084fc;
+  --accent-deep: #7c3aed;
+  --accent-glow: rgba(168, 85, 247, 0.3);
+
+  /* Secondary accent: Deep purple — consistent brand identity */
+  --secondary: #a855f7;
+  --secondary-bright: #c084fc;
+  --secondary-glow: rgba(168, 85, 247, 0.25);
+
+  /* Semantic colors */
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+
+  }
 
 @theme inline {
   --color-background: var(--bg);
@@ -21,9 +35,18 @@
   --color-panel: var(--bg-panel);
   --color-soft: var(--bg-soft);
   --color-line: var(--line);
-  --color-purple: var(--purple);
-  --color-purple-bright: var(--purple-bright);
-  --color-purple-deep: var(--purple-deep);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-accent-deep: var(--accent-deep);
+  --color-secondary: var(--secondary);
+  --color-secondary-bright: var(--secondary-bright);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  /* Legacy mappings */
+  --color-purple: var(--accent);
+  --color-purple-bright: var(--accent-bright);
+  --color-purple-deep: var(--accent-deep);
   --font-sans: var(--font-satoshi);
   --font-display: var(--font-poppins);
 }
@@ -42,15 +65,11 @@ body {
   color: var(--fg);
   font-family: var(--font-satoshi), sans-serif;
   background-color: var(--bg);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.75' intercept='-0.34'/%3E%3CfeFuncG type='linear' slope='1.75' intercept='-0.34'/%3E%3CfeFuncB type='linear' slope='1.75' intercept='-0.34'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 150px 150px;
-  background-blend-mode: soft-light;
 }
 
 ::selection {
-  background: rgba(139, 92, 246, 0.45);
-  color: white;
+  background: var(--accent-glow);
+  color: #fff;
 }
 
 a {
@@ -94,7 +113,7 @@ img {
 @keyframes pulse-soft {
   0%,
   100% {
-    box-shadow: 0 0 0 0 var(--purple-glow);
+    box-shadow: 0 0 0 0 var(--accent-glow);
   }
   50% {
     box-shadow: 0 0 0 12px transparent;
@@ -136,6 +155,18 @@ img {
   animation: value-pop 0.28s ease both;
 }
 
+/* Respect user motion preferences — disable all custom animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .robux-panel {
   transition:
     border-color 0.25s ease,
@@ -163,8 +194,8 @@ img {
   border-radius: 999px;
   background: linear-gradient(
     to right,
-    var(--purple) 0%,
-    var(--purple) var(--progress, 0%),
+    var(--accent) 0%,
+    var(--accent) var(--progress, 0%),
     #2a2a35 var(--progress, 0%),
     #2a2a35 100%
   );
@@ -179,7 +210,7 @@ img {
   height: 22px;
   border-radius: 999px;
   background: #fff;
-  border: 3px solid var(--purple-bright);
+  border: 3px solid var(--accent-bright);
   box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
   cursor: pointer;
   transition: transform 0.15s ease;
@@ -194,7 +225,7 @@ img {
   height: 22px;
   border-radius: 999px;
   background: #fff;
-  border: 3px solid var(--purple-bright);
+  border: 3px solid var(--accent-bright);
   box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
   cursor: pointer;
 }

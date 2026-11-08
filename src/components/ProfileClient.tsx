@@ -97,7 +97,7 @@ export function ProfileClient() {
                 className="h-14 w-14 rounded-full object-cover"
               />
             ) : (
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--purple)]/20 font-display text-xl font-bold text-[var(--purple-bright)]">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent)]/20 font-display text-xl font-bold text-[var(--accent-bright)]">
                 {(user?.displayName || user?.username || "?")
                   .slice(0, 1)
                   .toUpperCase()}
@@ -149,7 +149,7 @@ export function ProfileClient() {
                   minLength={8}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-[#101016] px-4 py-3 text-sm text-white outline-none focus:border-[var(--purple)]/50"
+                  className="w-full rounded-xl border border-white/10 bg-[#101016] px-4 py-3 text-sm text-white outline-none focus:border-[var(--accent)]/50"
                 />
               </div>
               <div>
@@ -162,7 +162,7 @@ export function ProfileClient() {
                   minLength={8}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-[#101016] px-4 py-3 text-sm text-white outline-none focus:border-[var(--purple)]/50"
+                  className="w-full rounded-xl border border-white/10 bg-[#101016] px-4 py-3 text-sm text-white outline-none focus:border-[var(--accent)]/50"
                 />
               </div>
               <div>
@@ -175,7 +175,7 @@ export function ProfileClient() {
                   minLength={8}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-[#101016] px-4 py-3 text-sm text-white outline-none focus:border-[var(--purple)]/50"
+                  className="w-full rounded-xl border border-white/10 bg-[#101016] px-4 py-3 text-sm text-white outline-none focus:border-[var(--accent)]/50"
                 />
               </div>
 
@@ -183,13 +183,13 @@ export function ProfileClient() {
                 <p className="text-sm text-red-300">{formError}</p>
               ) : null}
               {success ? (
-                <p className="text-sm text-emerald-300">{success}</p>
+                <p className="text-sm text-purple-300">{success}</p>
               ) : null}
 
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex rounded-xl bg-[var(--purple)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--purple-bright)] disabled:opacity-60"
+                className="inline-flex rounded-xl bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent-bright)] disabled:opacity-60"
               >
                 {saving ? "Salvando…" : "Salvar nova senha"}
               </button>

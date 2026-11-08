@@ -13,7 +13,7 @@ export default function SuportePage() {
   return (
     <div className="site-container py-12 md:py-16">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-medium uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+        <p className="text-sm font-medium uppercase tracking-[0.14em] text-[var(--accent-bright)]">
           Suporte
         </p>
         <h1 className="mt-3 font-display text-4xl font-bold text-white md:text-5xl">
@@ -40,7 +40,7 @@ export default function SuportePage() {
             href={DISCORD_SUPPORT_URL}
             target="_blank"
             rel="noreferrer"
-            className="font-semibold text-[var(--purple-bright)] hover:text-white"
+            className="font-semibold text-[var(--accent-bright)] hover:text-white"
           >
             discord.gg/hollowbux
           </a>
@@ -57,7 +57,7 @@ export default function SuportePage() {
             key={text}
             className="flex gap-3 rounded-2xl border border-white/[0.04] bg-[#09090d] p-4"
           >
-            <ShieldIcon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--purple-bright)]" />
+            <ShieldIcon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--accent-bright)]" />
             <span>{text}</span>
           </li>
         ))}

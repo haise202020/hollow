@@ -15,7 +15,7 @@ export function DiscountBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md border border-[var(--purple-bright)]/40 bg-[var(--purple)]/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[var(--purple-bright)] ${className}`}
+      className={`inline-flex items-center gap-1 rounded-md border border-[var(--accent-bright)]/40 bg-[var(--accent)]/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[var(--accent-bright)] ${className}`}
     >
       <svg
         viewBox="0 0 16 16"

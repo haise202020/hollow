@@ -8,9 +8,11 @@ import {
   ChevronIcon,
   InvoiceIcon,
   LogoutIcon,
+  ShieldIcon,
   UserIcon,
 } from "@/components/icons";
 import { prefetchAccountData } from "@/components/account/useAccountData";
+import { isAdminDiscordId } from "@/lib/auth/admin";
 
 const navItems = [
   { href: "/", label: "Início" },
@@ -24,6 +26,7 @@ type SessionUser = {
   username: string;
   displayName?: string;
   avatarUrl?: string | null;
+  discordId?: string | null;
   hasPassword?: boolean;
 };
 
@@ -132,7 +135,12 @@ export function Header() {
 
   const label = user?.displayName || user?.username;
 
+  const isAdmin = isAdminDiscordId(user?.discordId);
+
   const menuItems = [
+    ...(isAdmin
+      ? [{ href: "/admin/dashboard", label: "Dashboard", icon: ShieldIcon }]
+      : []),
     { href: "/perfil", label: "Perfil", icon: UserIcon },
     { href: "/faturas", label: "Faturas", icon: InvoiceIcon },
     { href: "/compras", label: "Minhas compras", icon: BagIcon },
@@ -163,7 +171,7 @@ export function Header() {
           />
           <span
             aria-hidden
-            className="pointer-events-none absolute bottom-[7px] h-[2px] rounded-full bg-[var(--purple-bright)] transition-all duration-300 ease-out"
+            className="pointer-events-none absolute bottom-[7px] h-[2px] rounded-full bg-[var(--accent-bright)] transition-all duration-300 ease-out"
             style={{
               left: indicator.left + Math.max((indicator.width - 20) / 2, 0),
               width: 20,
@@ -206,8 +214,8 @@ export function Header() {
                 }}
                 className={`inline-flex items-center gap-2 rounded-xl border bg-white/[0.03] py-1 pl-1 pr-2.5 transition ${
                   menuOpen
-                    ? "border-[var(--purple-bright)]"
-                    : "border-white/[0.08] hover:border-[var(--purple)]/40"
+                    ? "border-[var(--accent-bright)]"
+                    : "border-white/[0.08] hover:border-[var(--accent)]/40"
                 }`}
               >
                 {user.avatarUrl ? (
@@ -218,7 +226,7 @@ export function Header() {
                     className="h-8 w-8 rounded-full object-cover"
                   />
                 ) : (
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--purple)]/20 text-xs font-bold text-[var(--purple-bright)]">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent)]/20 text-xs font-bold text-[var(--accent-bright)]">
                     {(label || "?").slice(0, 1).toUpperCase()}
                   </span>
                 )}
@@ -271,7 +279,7 @@ export function Header() {
           ) : (
             <Link
               href="/login"
-              className="hidden rounded-full bg-[var(--purple)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--purple-bright)] sm:inline-flex"
+              className="hidden rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[#08090d] transition hover:bg-[var(--accent-bright)] hover:shadow-[0_0_20px_var(--accent-glow)] sm:inline-flex"
             >
               Entrar
             </Link>
@@ -322,7 +330,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="rounded-full px-4 py-2.5 text-sm text-[var(--purple-bright)] hover:bg-white/5"
+                    className="rounded-full px-4 py-2.5 text-sm text-[var(--accent-bright)] hover:bg-white/5"
                   >
                     {item.label}
                   </Link>
@@ -342,7 +350,7 @@ export function Header() {
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                className="rounded-full bg-[var(--purple)] px-4 py-2.5 text-center text-sm font-semibold text-white"
+                className="rounded-full bg-[var(--accent)] px-4 py-2.5 text-center text-sm font-semibold text-white"
               >
                 Entrar
               </Link>

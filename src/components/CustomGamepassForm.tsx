@@ -74,7 +74,7 @@ export function CustomGamepassForm() {
             onChange={(e) => setGameName(e.target.value)}
             placeholder="Ex: Blox Fruits, Adopt Me..."
             maxLength={80}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d12] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--fg-muted)] focus:border-[var(--purple)]"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d12] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--fg-muted)] focus:border-[var(--accent)]"
           />
         </label>
 
@@ -85,7 +85,7 @@ export function CustomGamepassForm() {
             onChange={(e) => setPassName(e.target.value)}
             placeholder="Ex: 2x Money, VIP Pass..."
             maxLength={80}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d12] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--fg-muted)] focus:border-[var(--purple)]"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d12] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--fg-muted)] focus:border-[var(--accent)]"
           />
         </label>
 
@@ -98,13 +98,13 @@ export function CustomGamepassForm() {
             onChange={(e) => setPriceRaw(e.target.value)}
             inputMode="decimal"
             placeholder="Ex: 49,90"
-            className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d12] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--fg-muted)] focus:border-[var(--purple)]"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-[#0d0d12] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--fg-muted)] focus:border-[var(--accent)]"
           />
         </label>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-[var(--purple)]/30 bg-[var(--purple)]/10 px-4 py-4">
-        <p className="text-xs uppercase tracking-[0.12em] text-[var(--purple-bright)]">
+      <div className="mt-6 rounded-2xl border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-4 py-4">
+        <p className="text-xs uppercase tracking-[0.12em] text-[var(--accent-bright)]">
           Valor do pedido
         </p>
         <p className="mt-1 font-display text-3xl font-bold text-white">
@@ -125,7 +125,7 @@ export function CustomGamepassForm() {
 
       <button
         type="submit"
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--purple)] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--purple-bright)]"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--accent-bright)]"
       >
         <BasketIcon className="h-4 w-4" />
         Continuar para o Pix

@@ -41,7 +41,7 @@ export function DashboardClient() {
       <div className="mb-6 flex flex-wrap gap-2">
         <Link
           href="/robux"
-          className="rounded-xl bg-[var(--purple)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--purple-bright)]"
+          className="rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--accent-bright)]"
         >
           Comprar Robux
         </Link>
@@ -85,7 +85,7 @@ export function DashboardClient() {
           <div
             key={card.label}
             style={{ animationDelay: `${0.06 * index}s` }}
-            className="animate-rise rounded-2xl border border-white/[0.06] bg-[#0c0c10] p-5 transition hover:border-[var(--purple)]/30"
+            className="animate-rise rounded-2xl border border-white/[0.06] bg-[#0c0c10] p-5 transition hover:border-[var(--accent)]/30"
           >
             <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--fg-muted)]">
               {card.label}
@@ -93,7 +93,7 @@ export function DashboardClient() {
             <p className="mt-3 font-display text-2xl font-bold text-white">
               {card.value}
             </p>
-            <p className="mt-2 text-xs text-[var(--purple-bright)]">{card.hint}</p>
+            <p className="mt-2 text-xs text-[var(--accent-bright)]">{card.hint}</p>
           </div>
         ))}
       </div>
@@ -109,8 +109,8 @@ export function DashboardClient() {
                 Ticket médio {stats?.averageTicketFormatted ?? "R$ 0,00"}
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--purple-bright)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--purple-bright)]" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent-bright)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-bright)]" />
               Conta ativa
             </span>
           </div>
@@ -130,7 +130,7 @@ export function DashboardClient() {
             <path
               d={CHART}
               fill="none"
-              stroke="var(--purple-bright)"
+              stroke="var(--accent-bright)"
               strokeWidth="2.5"
               strokeLinecap="round"
             />
@@ -148,7 +148,7 @@ export function DashboardClient() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-3 text-sm text-white transition hover:border-[var(--purple)]/35"
+                className="flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-3 text-sm text-white transition hover:border-[var(--accent)]/35"
               >
                 {item.label}
                 <span className="text-[var(--fg-muted)]">→</span>
@@ -165,7 +165,7 @@ export function DashboardClient() {
           </h2>
           <Link
             href="/compras"
-            className="text-sm text-[var(--purple-bright)] hover:text-white"
+            className="text-sm text-[var(--accent-bright)] hover:text-white"
           >
             Ver todos
           </Link>

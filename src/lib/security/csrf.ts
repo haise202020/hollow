@@ -13,13 +13,16 @@ export async function ensureCsrfCookie(): Promise<string> {
     return existing;
   }
 
+  // Token ausente ou inválido (ex: CSRF_SECRET trocado) → gerar novo
+  // automaticamente em vez de bloquear com 403. O frontend lê o cookie
+  // atualizado e usa o token fresco na próxima requisição.
   const token = await createCsrfToken();
   jar.set(CSRF_COOKIE, token, {
     httpOnly: false,
-    sameSite: "strict",
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 8,
+    maxAge: 60 * 60 * 24,
   });
 
   return token;

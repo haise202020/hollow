@@ -33,8 +33,26 @@ export default async function CheckoutPage({
 }) {
   const params = await searchParams;
   const type = first(params.type);
+  const orderId = first(params.orderId);
+  const viewToken = first(params.token);
   const gamepassId = first(params.id) ?? first(params.gamepassId);
   const robuxRaw = Number(first(params.amount) ?? first(params.robuxAmount));
+
+  // Retomada de pedido existente via orderId (ex: link de e-mail ou histórico)
+  if (orderId && !type) {
+    return (
+      <div className="site-container py-12 md:py-16">
+        <CheckoutClient
+          type="robux"
+          robuxAmount={0}
+          amountBrl={0}
+          productLabel="Pedido existente"
+          resumeOrderId={orderId}
+          resumeViewToken={viewToken}
+        />
+      </div>
+    );
+  }
 
   if (type === "robux") {
     const amount = robuxRaw;
@@ -155,7 +173,7 @@ function InvalidCheckout({
         <p className="mt-3 text-[var(--fg-muted)]">{message}</p>
         <Link
           href={href}
-          className="mt-8 inline-flex rounded-[12px] bg-[var(--purple)] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--purple-bright)]"
+          className="mt-8 inline-flex rounded-[12px] bg-[var(--accent)] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--accent-bright)]"
         >
           {action}
         </Link>

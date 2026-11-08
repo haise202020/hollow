@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { assertCsrf, CSRF_COOKIE } from "@/lib/security/csrf-core";
+import { apiError } from "@/lib/api/response";
+import { assertCsrf, getCsrfCookieFromHeaders } from "@/lib/security/csrf-core";
+import { ensureCsrfCookie } from "@/lib/security/csrf";
 import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
 import { sanitizeText } from "@/lib/security/sanitize";
 
@@ -21,15 +23,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  const cookieToken = cookieHeader
-    .split(";")
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${CSRF_COOKIE}=`))
-    ?.split("=")[1];
+  const cookieToken = getCsrfCookieFromHeaders(request.headers);
 
   if (!(await assertCsrf(request, cookieToken))) {
-    return NextResponse.json({ error: "Token CSRF inválido." }, { status: 403 });
+    await ensureCsrfCookie();
+    return apiError("Token CSRF expirado. Tente novamente.", 419);
   }
 
   let body: unknown;
@@ -52,11 +50,22 @@ export async function POST(request: Request) {
 
   const parsed = contactSchema.safeParse(candidate);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Dados inválidos.", details: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return apiError("Dados inválidos.", 400, {
+      details: parsed.error.flatten(),
+    });
   }
+
+  // Structured log so messages are actually captured (no silent discard).
+  console.log(
+    JSON.stringify({
+      event: "contact_form",
+      name: parsed.data.name,
+      email: parsed.data.email,
+      message: parsed.data.message.slice(0, 200),
+      ip,
+      ts: new Date().toISOString(),
+    }),
+  );
 
   return NextResponse.json({
     ok: true,

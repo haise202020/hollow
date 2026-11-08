@@ -30,7 +30,7 @@ async function orders() {
     col.createIndex({ id: 1 }, { unique: true }).catch(() => undefined),
     col
       .createIndex(
-        { misticTransactionId: 1 },
+        { transactionId: 1 },
         { unique: true, sparse: true },
       )
       .catch(() => undefined),
@@ -52,6 +52,9 @@ export async function getOrder(id: string): Promise<Order | null> {
   const doc = await col.findOne({ id }, { projection: { _id: 0 } });
   return doc ?? null;
 }
+
+/** Alias usado pela API de chat e outros módulos que referenciam "findById". */
+export const findOrderById = getOrder;
 
 export async function updateOrderStatus(
   id: string,
@@ -115,15 +118,38 @@ export async function updateOrderAdmin(
   return result ?? null;
 }
 
-export async function findOrderByMisticId(
-  misticTransactionId: string,
+export async function findOrderByTransactionId(
+  transactionId: string,
 ): Promise<Order | null> {
   const col = await orders();
   const doc = await col.findOne(
-    { misticTransactionId },
+    { transactionId },
     { projection: { _id: 0 } },
   );
   return doc ?? null;
+}
+
+/**
+ * Busca o pedido PENDENTE mais recente do usuário com o mesmo valor,
+ * criado nos últimos 10 minutos. Usado como fallback quando a SevenPay
+ * retorna 409 (Idempotency-Key já reservada).
+ */
+export async function findRecentPendingOrder(
+  accountUserId: string,
+  amountBrl: number,
+): Promise<Order | null> {
+  const col = await orders();
+  const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  return col.findOne(
+    {
+      accountUserId,
+      amountBrl,
+      status: "PENDENTE",
+      createdAt: { $gte: tenMinAgo },
+      copyPaste: { $exists: true, $ne: null as unknown as string },
+    },
+    { sort: { createdAt: -1 }, projection: { _id: 0 } },
+  );
 }
 
 export async function listOrdersByAccountUserId(

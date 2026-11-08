@@ -29,7 +29,7 @@ export type Order = {
   payerDocument: string;
   status: OrderStatus;
   adminStatus: AdminStatus;
-  misticTransactionId?: string;
+  transactionId?: string;
   copyPaste?: string;
   qrCodeBase64?: string;
   qrcodeUrl?: string;

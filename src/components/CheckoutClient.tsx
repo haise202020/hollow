@@ -6,6 +6,36 @@ import { gamepassPriceForNetRobux } from "@/lib/data/catalog";
 import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/security/constants";
 import { BasketIcon, BoltIcon, LockIcon, ShieldIcon } from "./icons";
 
+/**
+ * Verifica se uma URL é realmente uma imagem de QR code utilizável.
+ * URLs de checkout/redirecionamento da SevenPay (ex: /pix/{uuid}) são páginas HTML,
+ * não imagens — usá-las em <img> resulta em imagem quebrada.
+ */
+function isValidQrImageUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  // Base64 data URIs são sempre válidas
+  if (url.startsWith("data:image/")) return true;
+  // URLs externas devem apontar diretamente para uma imagem
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname.toLowerCase();
+    return /\.(png|jpg|jpeg|gif|svg|webp)(\?|$)/i.test(path);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Gera URL de QR code via api.qrserver.com a partir do código PIX copia-e-cola
+ * quando a SevenPay não retorna qrCodeBase64 ou qrcodeUrl válido.
+ * Evita dependência da biblioteca `qrcode` que usa APIs Node.js indisponíveis no navegador.
+ */
+function buildQrUrlFromCopyPaste(copyPaste: string): string | null {
+  if (!copyPaste) return null;
+  const encoded = encodeURIComponent(copyPaste);
+  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&bgcolor=ececef&data=${encoded}`;
+}
+
 type CheckoutType = "robux" | "gamepass" | "custom_gamepass";
 
 type CheckoutOrder = {
@@ -95,9 +125,9 @@ function CheckoutSteps({
               <span
                 className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition ${
                   done
-                    ? "bg-[var(--purple)] text-white"
+                    ? "bg-[var(--accent)] text-white"
                     : active
-                      ? "bg-[var(--purple)]/25 text-[var(--purple-bright)] ring-1 ring-[var(--purple)]"
+                      ? "bg-[var(--accent)]/25 text-[var(--accent-bright)] ring-1 ring-[var(--accent)]"
                       : "bg-white/[0.04] text-[var(--fg-muted)]"
                 }`}
               >
@@ -114,7 +144,7 @@ function CheckoutSteps({
             {index < steps.length - 1 ? (
               <div
                 className={`mb-5 h-px w-6 sm:w-10 ${
-                  done ? "bg-[var(--purple)]" : "bg-white/10"
+                  done ? "bg-[var(--accent)]" : "bg-white/10"
                 }`}
                 aria-hidden
               />
@@ -135,6 +165,8 @@ type Props = {
   amountBrl: number;
   productLabel: string;
   image?: string;
+  resumeOrderId?: string;
+  resumeViewToken?: string;
 };
 
 function readCookie(name: string): string | null {
@@ -155,6 +187,8 @@ export function CheckoutClient({
   amountBrl,
   productLabel,
   image,
+  resumeOrderId,
+  resumeViewToken,
 }: Props) {
   const [robloxUsername, setRobloxUsername] = useState("");
   const [profile, setProfile] = useState<RobloxProfile | null>(null);
@@ -165,6 +199,55 @@ export function CheckoutClient({
   const [error, setError] = useState("");
   const [order, setOrder] = useState<CheckoutOrder | null>(null);
   const [copied, setCopied] = useState(false);
+  const [generatedQr, setGeneratedQr] = useState<string | null>(null);
+
+  // Gera URL de QR code via api.qrserver.com quando a SevenPay não retorna imagem válida
+  // URLs de checkout/redirecionamento (ex: /pix/{uuid}) são páginas HTML, não imagens
+  const validApiQr = isValidQrImageUrl(order?.qrCodeBase64) ? order!.qrCodeBase64 : null;
+  const validExtQr = isValidQrImageUrl(order?.qrcodeUrl) ? order!.qrcodeUrl : null;
+
+  useEffect(() => {
+    if (validApiQr || validExtQr) {
+      setGeneratedQr(null);
+      return;
+    }
+    if (!order?.copyPaste) {
+      setGeneratedQr(null);
+      return;
+    }
+    setGeneratedQr(buildQrUrlFromCopyPaste(order.copyPaste));
+  }, [order?.copyPaste, validApiQr, validExtQr]);
+
+  // Retomada de pedido existente: carrega dados e pula para etapa PIX
+  useEffect(() => {
+    if (!resumeOrderId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const params = new URLSearchParams({ orderId: resumeOrderId });
+        if (resumeViewToken) params.set("token", resumeViewToken);
+        const res = await fetch(`/api/checkout/status?${params.toString()}`, {
+          cache: "no-store",
+        });
+        const data = (await res.json()) as { order?: CheckoutOrder };
+        if (cancelled || !res.ok || !data.order) return;
+        setOrder(data.order);
+        setRobloxUsername(data.order.robloxUsername ?? "");
+        setStep(
+          data.order.status === "COMPLETO" ||
+            (data.order.adminStatus ?? "AGUARDANDO") === "APROVADO"
+            ? "paid"
+            : "pix",
+        );
+      } catch {
+        // silencioso — polling existente cuidará de retries
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [resumeOrderId, resumeViewToken]);
+
   const [lookingUp, setLookingUp] = useState(false);
   const [checkingPass, setCheckingPass] = useState(false);
 
@@ -418,7 +501,7 @@ export function CheckoutClient({
       <div>
         <CheckoutSteps current={currentStep} type={type} />
         <div className="mx-auto max-w-xl rounded-3xl border border-white/[0.02] bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.2),transparent_55%),#0c0c12] px-6 py-10 text-center md:px-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--accent-bright)]">
             {isRejected
               ? "Pedido recusado"
               : paymentDone
@@ -469,7 +552,7 @@ export function CheckoutClient({
           <p className="mt-3 text-xs text-[var(--fg-muted)]">Pedido {order.id}</p>
           <Link
             href="/"
-            className="mt-8 inline-flex rounded-[12px] bg-[var(--purple)] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--purple-bright)]"
+            className="mt-8 inline-flex rounded-[12px] bg-[var(--accent)] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--accent-bright)]"
           >
             Voltar ao início
           </Link>
@@ -483,7 +566,7 @@ export function CheckoutClient({
       <div>
         <CheckoutSteps current={currentStep} type={type} />
         <section className="mx-auto w-full max-w-lg rounded-3xl border border-white/[0.02] bg-[#0c0c12] p-6 text-center transition duration-200 hover:scale-[1.02] md:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--accent-bright)]">
             Etapa 1
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold text-white md:text-4xl">
@@ -502,7 +585,7 @@ export function CheckoutClient({
                 Nick / usuário
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[var(--purple-bright)]">
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[var(--accent-bright)]">
                   @
                 </span>
                 <input
@@ -520,7 +603,7 @@ export function CheckoutClient({
                   placeholder="seu_nick"
                   autoComplete="off"
                   autoFocus
-                  className="w-full rounded-xl border border-white/10 bg-[#101016] py-3.5 pl-9 pr-4 text-sm text-white outline-none ring-[var(--purple)] transition focus:ring-2"
+                  className="w-full rounded-xl border border-white/10 bg-[#101016] py-3.5 pl-9 pr-4 text-sm text-white outline-none ring-[var(--accent)] transition focus:ring-2"
                 />
               </div>
             </div>
@@ -534,7 +617,7 @@ export function CheckoutClient({
             <button
               type="submit"
               disabled={lookingUp}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-[12px] bg-[var(--purple)] px-4 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--purple-bright)] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-[12px] bg-[var(--accent)] px-4 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--accent-bright)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {lookingUp ? "Buscando conta…" : "Continuar"}
             </button>
@@ -549,7 +632,7 @@ export function CheckoutClient({
       <div>
         <CheckoutSteps current={currentStep} type={type} />
         <section className="mx-auto w-full max-w-lg rounded-3xl border border-white/[0.02] bg-[#0c0c12] p-6 transition duration-200 hover:scale-[1.02] md:p-10">
-          <p className="text-center text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+          <p className="text-center text-sm font-semibold uppercase tracking-[0.14em] text-[var(--accent-bright)]">
             Etapa 1
           </p>
           <h1 className="mt-2 text-center font-display text-3xl font-bold text-white md:text-4xl">
@@ -582,12 +665,12 @@ export function CheckoutClient({
                   <p className="truncate font-display text-xl font-bold text-white">
                     {profile.displayName}
                     {profile.hasVerifiedBadge ? (
-                      <span className="ml-2 text-sm text-[var(--purple-bright)]">
+                      <span className="ml-2 text-sm text-[var(--accent-bright)]">
                         ✓
                       </span>
                     ) : null}
                   </p>
-                  <p className="mt-0.5 text-sm text-[var(--purple-bright)]">
+                  <p className="mt-0.5 text-sm text-[var(--accent-bright)]">
                     @{profile.name}
                   </p>
                 </div>
@@ -636,7 +719,7 @@ export function CheckoutClient({
                     void createPayment();
                   }
                 }}
-                className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-[var(--purple)] px-4 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--purple-bright)]"
+                className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-[var(--accent)] px-4 py-3.5 text-sm font-bold text-white transition hover:bg-[var(--accent-bright)]"
               >
                 Sim, sou eu
               </button>
@@ -658,7 +741,7 @@ export function CheckoutClient({
         <CheckoutSteps current={currentStep} type={type} />
         <div className="mx-auto grid max-w-5xl select-none gap-5 lg:grid-cols-[1.45fr_0.9fr] lg:items-start">
           <section className="rounded-2xl border border-white/[0.02] bg-[#09090d] p-5 transition duration-200 hover:scale-[1.01] md:p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--accent-bright)]">
               Etapa 2
             </p>
             <h1 className="mt-2 font-display text-2xl font-bold text-white md:text-3xl">
@@ -677,7 +760,7 @@ export function CheckoutClient({
                 <span className="select-text">
                   {requiredGamepassPrice.toLocaleString("pt-BR")}
                 </span>
-                <span className="ml-2 text-lg text-[var(--purple-bright)]">
+                <span className="ml-2 text-lg text-[var(--accent-bright)]">
                   Robux
                 </span>
               </p>
@@ -707,7 +790,7 @@ export function CheckoutClient({
                     )}
                   </div>
                   <div className="min-w-0 text-left">
-                    <p className="text-sm font-semibold text-emerald-300">
+                    <p className="text-sm font-semibold text-purple-300">
                       Gamepass detectada
                     </p>
                     <p className="mt-0.5 truncate text-white">
@@ -751,7 +834,7 @@ export function CheckoutClient({
                 type="button"
                 disabled={!detectedPass || step === "loading"}
                 onClick={() => void createPayment(detectedPass?.id)}
-                className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-[var(--purple)] px-4 py-3 text-sm font-bold text-white transition hover:bg-[var(--purple-bright)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-[var(--accent)] px-4 py-3 text-sm font-bold text-white transition hover:bg-[var(--accent-bright)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <BasketIcon className="h-[18px] w-[18px]" />
                 {step === "loading" ? "Gerando PIX…" : "Continuar para o PIX"}
@@ -773,7 +856,7 @@ export function CheckoutClient({
           </section>
 
           <aside className="rounded-2xl border border-white/[0.02] bg-[#09090d] p-5 transition duration-200 hover:scale-[1.01] md:p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--purple-bright)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--accent-bright)]">
               Tutorial
             </p>
             <h2 className="mt-2 font-display text-2xl font-bold text-white">
@@ -811,7 +894,7 @@ export function CheckoutClient({
                 },
               ].map((item, index) => (
                 <li key={item.title} className="flex gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--purple)]/20 text-sm font-bold text-[var(--purple-bright)]">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent)]/20 text-sm font-bold text-[var(--accent-bright)]">
                     {index + 1}
                   </span>
                   <div>
@@ -830,7 +913,7 @@ export function CheckoutClient({
               href="https://create.roblox.com/dashboard/creations"
               target="_blank"
               rel="noreferrer"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-[12px] border border-white/15 px-4 py-3 text-sm font-semibold text-white transition hover:border-[var(--purple)]/50 hover:text-[var(--purple-bright)]"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-[12px] border border-white/15 px-4 py-3 text-sm font-semibold text-white transition hover:border-[var(--accent)]/50 hover:text-[var(--accent-bright)]"
             >
               Abrir Creator Dashboard
             </a>
@@ -846,98 +929,80 @@ export function CheckoutClient({
 
       {step === "pix" && order ? (
         <div
-          className="mx-auto grid max-w-5xl select-none gap-6 lg:grid-cols-[1.5fr_0.9fr] lg:items-start"
+          className="mx-auto flex max-w-md flex-col items-center gap-6 select-none py-4 lg:max-w-none"
           onDragStart={(e) => e.preventDefault()}
         >
-          <section className="-ml-[2cm] w-[calc(100%+2cm)] rounded-2xl border border-white/[0.02] bg-[#09090d] p-5 md:p-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-[var(--purple)]/15 px-3 py-1 text-[11px] font-semibold text-[var(--purple-bright)]">
-                Etapa 3 · PIX
-              </span>
-              <span className="rounded-full border border-white/[0.06] px-3 py-1 text-[11px] text-[var(--fg-muted)]">
-                Status:{" "}
-                {order.status === "PENDENTE" ? "Aguardando" : order.status}
-              </span>
-            </div>
+          {/* Wrapper relativo: ancora o card lateral ao card principal centralizado */}
+          <div className="relative w-full max-w-md">
+          {/* Card principal — QR Code + Copia e Cola (sempre centralizado) */}
+          <section className="relative z-10 w-full overflow-hidden rounded-2xl border border-white/[0.06] bg-[#09090d] px-6 pb-8 pt-10 text-center">
+            {/* Acento roxo no topo */}
+            <div className="absolute left-1/2 top-0 h-[3px] w-16 -translate-x-1/2 rounded-b-full bg-[var(--accent)]" />
 
-            <h1 className="mt-3.5 font-display text-[1.75rem] font-bold text-white md:text-[2rem]">
-              Escaneie e pague
+            <h1 className="font-display text-xl font-bold text-white md:text-2xl">
+              Concluir pagamento
             </h1>
-            <p className="mt-2 max-w-lg text-sm text-[var(--fg-muted)]">
-              Assim que o PIX cair, confirmamos sozinhos e seguimos com a
-              entrega pra{" "}
-              <span className="select-text">@{order.robloxUsername}</span>.
+            <p className="mt-2 text-sm text-[var(--fg-muted)]">
+              Use a câmera do seu celular para escanear o QR Code.
             </p>
 
-            <div className="mt-5 grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center">
-              <div className="mx-auto flex h-[170px] w-[170px] items-center justify-center rounded-2xl border border-white/[0.06] bg-[#ececef] p-2.5 sm:mx-0">
-                {order.qrCodeBase64 || order.qrcodeUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={order.qrCodeBase64 || order.qrcodeUrl}
-                    alt="QR Code PIX"
-                    className="pointer-events-none h-full w-full object-contain"
-                    draggable={false}
-                  />
-                ) : (
-                  <p className="text-xs text-black/60">QR indisponível</p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                {[
-                  { title: "Abra o banco", text: "Entre na área PIX do app" },
-                  { title: "Leia o QR", text: "Ou use o copia e cola" },
-                  { title: "Confirme", text: "Valide o valor e pague" },
-                  { title: "Pronto", text: "A Hollow confirma sozinha" },
-                ].map((item, index) => (
-                  <div key={item.title} className="rounded-xl bg-[var(--bg)] p-2.5">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--purple-bright)]">
-                      0{index + 1}
-                    </p>
-                    <p className="mt-1 font-display text-sm font-semibold text-white">
-                      {item.title}
-                    </p>
-                    <p className="mt-0.5 text-xs leading-snug text-[var(--fg-muted)]">
-                      {item.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            {/* QR Code centralizado */}
+            <div className="mx-auto mt-6 flex h-[220px] w-[220px] items-center justify-center rounded-2xl border border-white/[0.06] bg-white p-3">
+              {validApiQr || validExtQr || generatedQr ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={validApiQr || validExtQr || generatedQr!}
+                  alt="QR Code PIX"
+                  className="pointer-events-none h-full w-full object-contain"
+                  draggable={false}
+                />
+              ) : order.copyPaste ? (
+                <p className="text-xs text-black/60">Gerando QR…</p>
+              ) : (
+                <p className="text-xs text-black/60">QR indisponível</p>
+              )}
             </div>
 
-            <div className="mt-5 rounded-xl p-3.5">
-              <p className="mb-2 text-xs font-medium text-[var(--fg-muted)]">
-                Código PIX copia e cola
-              </p>
-              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                <input
-                  readOnly
-                  value={order.copyPaste ?? ""}
-                  className="min-w-0 flex-1 select-text truncate rounded-lg border border-white/[0.06] bg-[#09090d] px-3.5 py-2.5 text-xs text-[#cfcfd8] outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={copyPix}
-                  className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition ${
-                    copied
-                      ? "bg-[var(--purple-deep)]"
-                      : "bg-[var(--purple)] hover:bg-[var(--purple-bright)]"
-                  }`}
-                >
-                  {copied ? "Copiado!" : "Copiar código"}
-                </button>
-              </div>
-              <p className="mt-2.5 truncate text-[11px] text-[var(--fg-muted)]">
-                <span className="select-text">Pedido {order.id}</span>
-              </p>
+            {/* Divisor + Copia e Cola */}
+            <div className="mx-auto mt-6 h-px w-full max-w-xs bg-white/[0.06]" />
+            <p className="mt-4 text-xs font-medium text-[var(--fg-muted)]">
+              Ou use o copia e cola
+            </p>
+
+            <div className="mx-auto mt-3 flex max-w-sm items-center gap-2">
+              <input
+                readOnly
+                value={order.copyPaste ?? ""}
+                className="min-w-0 flex-1 select-text truncate rounded-lg border border-white/[0.06] bg-[#121113] px-3.5 py-2.5 text-xs font-semibold text-white outline-none"
+              />
+              <button
+                type="button"
+                onClick={copyPix}
+                className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition ${
+                  copied
+                    ? "bg-[var(--accent-deep)]"
+                    : "bg-[var(--accent)] hover:bg-[var(--accent-bright)]"
+                }`}
+              >
+                {copied ? "Copiado!" : "Copiar"}
+              </button>
             </div>
 
             {error ? (
-              <p className="mt-3 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+              <p className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
                 {error}
               </p>
             ) : null}
+
+            <div className="mt-5 flex items-center justify-center gap-3 text-[11px] text-[var(--fg-muted)]">
+              <span className="select-text">Pedido {order.id}</span>
+              <span className="text-white/20">·</span>
+              <span className="font-semibold text-white">{order.amountFormatted}</span>
+              <span className="text-white/20">·</span>
+              <span>
+                {order.status === "PENDENTE" ? "Aguardando" : order.status}
+              </span>
+            </div>
 
             <button
               type="button"
@@ -951,63 +1016,52 @@ export function CheckoutClient({
               Voltar
             </button>
           </section>
+          </div>
 
-          <aside className="mt-[1.5cm] translate-x-[1cm] rounded-xl border border-white/[0.02] bg-[#09090d] p-4 font-sans md:p-5">
-            <p className="font-display text-sm font-semibold text-[var(--purple-bright)]">
-              Valor Total
-            </p>
-            <div className="mt-2 flex flex-wrap items-end justify-between gap-2">
-              <p className="font-display text-[2.1rem] font-bold leading-none tracking-tight text-white md:text-[2.45rem]">
-                {order.amountFormatted}
-              </p>
-              <p className="mb-0.5 inline-flex items-center gap-1 font-sans text-xs text-[var(--fg-muted)]">
-                <LockIcon className="h-3 w-3" />
-                Pagamento 100% Seguro
-              </p>
-            </div>
+          {/* Card secundário — Como pagar com PIX (fixo à direita do centro em telas grandes) */}
+          <section className="relative w-full overflow-hidden rounded-2xl border border-white/[0.06] bg-[#09090d] p-6 lg:fixed lg:left-[calc(50%+14rem)] lg:top-[250px] lg:w-[280px] lg:z-20">
+            {/* Acento roxo na lateral esquerda */}
+            <div className="absolute bottom-0 left-0 top-0 w-[3px] bg-[var(--accent)]" />
 
-            <div className="mt-6 space-y-3.5">
-              <div>
-                <p className="inline-flex items-center gap-1.5 font-display text-sm font-semibold text-white">
-                  <LockIcon className="h-3.5 w-3.5 shrink-0 text-[var(--purple-bright)]" />
-                  Ambiente Seguro
-                </p>
-                <p className="mt-0.5 font-sans text-xs leading-relaxed text-[var(--fg-muted)]">
-                  Seus dados protegidos em toda a compra.
+            <h2 className="font-display text-base font-bold text-white">
+              Como pagar com PIX?
+            </h2>
+
+            <div className="mt-4 space-y-3.5">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15">
+                  <svg className="h-4 w-4 text-[var(--accent-bright)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-sm leading-relaxed text-[var(--fg-muted)]">
+                  Abra o aplicativo do seu banco e escaneie o QR Code acima.
                 </p>
               </div>
 
-              <div>
-                <p className="inline-flex items-center gap-1.5 font-display text-sm font-semibold text-white">
-                  <BoltIcon className="h-3.5 w-3.5 shrink-0 text-[var(--purple-bright)]" />
-                  Pagamento Instantâneo
-                </p>
-                <p className="mt-0.5 font-sans text-xs leading-relaxed text-[var(--fg-muted)]">
-                  Confirmação automática via PIX.
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15">
+                  <svg className="h-4 w-4 text-[var(--accent-bright)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-sm leading-relaxed text-[var(--fg-muted)]">
+                  Copie o código Pix e cole no aplicativo do seu banco.
                 </p>
               </div>
 
-              <div className="border-t border-white/10 pt-3.5">
-                <p className="inline-flex items-center gap-1.5 font-display text-sm font-semibold text-white">
-                  <ShieldIcon className="h-3.5 w-3.5 shrink-0 text-[var(--purple-bright)]" />
-                  Garantia Hollow
-                </p>
-                <p className="mt-0.5 font-sans text-xs leading-relaxed text-[var(--fg-muted)]">
-                  Entrega segura para{" "}
-                  <span className="select-text">@{order.robloxUsername}</span>.
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15">
+                  <svg className="h-4 w-4 text-[var(--accent-bright)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-sm leading-relaxed text-[var(--fg-muted)]">
+                  Após o pagamento, o pedido será processado automaticamente.
                 </p>
               </div>
             </div>
-
-            <div className="mt-6 border-t border-white/10 pt-3.5">
-              <p className="font-display text-xs font-medium uppercase tracking-[0.14em] text-[var(--fg-muted)]">
-                Pedido
-              </p>
-              <p className="mt-1 font-display text-sm font-semibold text-white">
-                {productLabel}
-              </p>
-            </div>
-          </aside>
+          </section>
         </div>
       ) : null}
     </div>

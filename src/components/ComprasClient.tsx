@@ -61,7 +61,7 @@ export function ComprasClient() {
             onClick={() => setTab(item.id)}
             className={`rounded-full px-4 py-2 text-sm font-medium transition ${
               tab === item.id
-                ? "bg-[var(--purple)] text-white"
+                ? "bg-[var(--accent)] text-white"
                 : "text-[var(--fg-muted)] hover:text-white"
             }`}
           >
@@ -79,7 +79,7 @@ export function ComprasClient() {
           </p>
           <Link
             href="/robux"
-            className="mt-4 inline-flex rounded-xl bg-[var(--purple)] px-4 py-2.5 text-sm font-semibold text-white"
+            className="mt-4 inline-flex rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-white"
           >
             Comprar Robux
           </Link>
@@ -95,7 +95,7 @@ export function ComprasClient() {
             return (
               <article
                 key={order.id}
-                className="rounded-2xl border border-white/[0.06] bg-[#0c0c10] p-5 transition hover:border-[var(--purple)]/25"
+                className="rounded-2xl border border-white/[0.06] bg-[#0c0c10] p-5 transition hover:border-[var(--accent)]/25"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -135,6 +135,28 @@ export function ComprasClient() {
                     Gamepass:{" "}
                     <span className="text-white">{gamepassRef || "—"}</span>
                   </p>
+                </div>
+
+                <div className="mt-4 flex justify-end border-t border-white/[0.06] pt-4">
+                  <Link
+                    href={`/chat/${order.id}`}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)]/15 px-4 py-2 text-xs font-semibold text-[var(--accent-bright)] transition hover:bg-[var(--accent)] hover:text-white"
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                    Conversar com suporte
+                  </Link>
                 </div>
               </article>
             );

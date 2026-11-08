@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { getSession } from "@/lib/auth/session";
 import { findUserById, updateUserPassword } from "@/lib/auth/users";
 import { assertCsrf, CSRF_COOKIE } from "@/lib/security/csrf-core";
+import { ensureCsrfCookie } from "@/lib/security/csrf";
 import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
 
 const bodySchema = z.object({
@@ -34,7 +35,11 @@ export async function POST(request: Request) {
     ?.split("=")[1];
 
   if (!(await assertCsrf(request, cookieToken))) {
-    return NextResponse.json({ error: "Token CSRF inválido." }, { status: 403 });
+    await ensureCsrfCookie();
+    return NextResponse.json(
+      { error: "Token CSRF expirado. Tente novamente." },
+      { status: 419 },
+    );
   }
 
   let body: unknown;

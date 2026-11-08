@@ -3,11 +3,18 @@ import {
   ButtonBuilder,
   ButtonStyle,
   Client,
+  ComponentType,
+  ContainerBuilder,
   EmbedBuilder,
   Events,
   GatewayIntentBits,
+  MediaGalleryBuilder,
   MessageFlags,
   Partials,
+  SectionBuilder,
+  SeparatorBuilder,
+  TextDisplayBuilder,
+  ThumbnailBuilder,
   type TextChannel,
 } from "discord.js";
 import {
@@ -33,10 +40,11 @@ function getChannelId() {
 }
 
 function getDeliveryChannelId() {
-  return (
-    process.env.DISCORD_DELIVERY_CHANNEL_ID?.trim() ||
-    "1535747383953199144"
-  );
+  return process.env.DISCORD_DELIVERY_CHANNEL_ID?.trim() || "";
+}
+
+function getVouchersChannelId() {
+  return process.env.DISCORD_VOUCHES_CHANNEL_ID?.trim() || "";
 }
 
 async function getTextChannel(
@@ -156,12 +164,26 @@ async function getOrdersChannel(client: Client): Promise<TextChannel | null> {
   return getTextChannel(client, getChannelId());
 }
 
-export function buildDeliveryEmbed(order: Order) {
+export async function buildDeliveryEmbed(order: Order): Promise<EmbedBuilder> {
+  // Busca avatar e displayName do Roblox para enriquecer a notificação
+  let avatarUrl: string | null = null;
+  let displayName: string | null = null;
+  try {
+    const { lookupRobloxUser } = await import("@/lib/roblox/lookup");
+    const profile = await lookupRobloxUser(order.robloxUsername);
+    if (profile) {
+      avatarUrl = profile.avatarUrl;
+      displayName = profile.displayName !== profile.name ? profile.displayName : null;
+    }
+  } catch {
+    // Silencioso — usa dados locais se API falhar
+  }
+
   const fields = [
     { name: "Pedido", value: `\`${order.id}\``, inline: false },
     {
       name: "Nick Roblox",
-      value: `@${order.robloxUsername}`,
+      value: `@${order.robloxUsername}${displayName ? ` (${displayName})` : ""}`,
       inline: true,
     },
     {
@@ -170,7 +192,16 @@ export function buildDeliveryEmbed(order: Order) {
       inline: true,
     },
     { name: "Produto", value: order.productLabel, inline: true },
-    { name: "Tipo", value: order.type === "robux" ? "Robux" : order.type === "custom_gamepass" ? "Gamepass personalizada" : "Gamepass", inline: true },
+    {
+      name: "Tipo",
+      value:
+        order.type === "robux"
+          ? "Robux"
+          : order.type === "custom_gamepass"
+            ? "Gamepass personalizada"
+            : "Gamepass",
+      inline: true,
+    },
     { name: "Valor pago", value: formatBrl(order.amountBrl), inline: true },
   ];
 
@@ -232,15 +263,30 @@ export function buildDeliveryEmbed(order: Order) {
     });
   }
 
-  return new EmbedBuilder()
+  // Link do chat de suporte vinculado ao pedido
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const chatUrl = `${siteUrl}/chat/${order.id}`;
+  fields.push({
+    name: "💬 Chat de Suporte",
+    value: `[Abrir conversa com o cliente](${chatUrl})`,
+    inline: false,
+  });
+
+  const embed = new EmbedBuilder()
     .setTitle("📦 Entrega liberada — Hollow")
     .setDescription(
       "Pedido aprovado. Envie a gamepass / Robux para o nick abaixo.",
     )
-    .setColor(0x22c55e)
+    .setColor(0x8b5cf6)
     .addFields(fields)
     .setFooter({ text: "Hollow Bux · canal de entregas" })
     .setTimestamp(new Date(order.approvedAt || order.updatedAt || order.createdAt));
+
+  if (avatarUrl) {
+    embed.setThumbnail(avatarUrl);
+  }
+
+  return embed;
 }
 
 export async function notifyDeliveryChannel(order: Order): Promise<void> {
@@ -253,10 +299,65 @@ export async function notifyDeliveryChannel(order: Order): Promise<void> {
     return;
   }
 
+  const embed = await buildDeliveryEmbed(order);
   await channel.send({
     content: `Entrega pra **@${order.robloxUsername}**`,
-    embeds: [buildDeliveryEmbed(order)],
+    embeds: [embed],
   });
+}
+
+export function buildVouchComponentsV2(order: Order) {
+  const container = new ContainerBuilder()
+    .setAccentColor(0x8b5cf6)
+    .addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`## ✅ Compra concluída — ${order.productLabel}`),
+        )
+        .setThumbnailAccessory(
+          new ThumbnailBuilder().setURL("https://i.imgur.com/uVxPXOo.png"),
+        ),
+    )
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(1))
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `- **Pedido:** \`${order.id}\`\n- **Usuário:** @${order.robloxUsername}\n- **Valor:** ${formatBrl(order.amountBrl)}\n- **Produto:** ${order.productLabel}${order.robuxAmount ? `\n- **Robux:** ${order.robuxAmount.toLocaleString("pt-BR")}` : ""}`,
+      ),
+    )
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(1))
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        "*Obrigado por comprar na Hollow! Sua confiança é o que nos move.* 💜",
+      ),
+    );
+
+  return container;
+}
+
+export async function notifyVouchChannel(order: Order): Promise<void> {
+  const client = await ensureDiscordBot();
+  if (!client) return;
+
+  const channelId = getVouchersChannelId();
+  if (!channelId) {
+    console.warn("[discord] DISCORD_VOUCHES_CHANNEL_ID não configurado.");
+    return;
+  }
+
+  const channel = await getTextChannel(client, channelId);
+  if (!channel) {
+    console.warn("[discord] Canal de vouches não encontrado.");
+    return;
+  }
+
+  try {
+    await channel.send({
+      flags: MessageFlags.IsComponentsV2,
+      components: [buildVouchComponentsV2(order)],
+    });
+  } catch (error) {
+    console.error("[discord] Falha ao enviar vouch:", error);
+  }
 }
 
 export async function notifyOrderCreated(order: Order): Promise<void> {
@@ -378,6 +479,12 @@ async function handleOrderButton(
       await notifyDeliveryChannel(finalized);
     } catch (error) {
       console.error("[discord] Falha ao enviar no canal de entregas:", error);
+    }
+
+    try {
+      await notifyVouchChannel(finalized);
+    } catch (error) {
+      console.error("[discord] Falha ao enviar vouch:", error);
     }
   }
 

@@ -1,58 +1,61 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
-  findOrderByMisticId,
+  findOrderByTransactionId,
   getOrder,
   updateOrderStatus,
 } from "@/lib/orders/store";
-import { normalizePaymentStatus } from "@/lib/payments/misticpay";
-import { timingSafeEqual } from "node:crypto";
+import { normalizePaymentStatus } from "@/lib/payments/sevenpay";
 
 const bodySchema = z.object({
+  id: z.string().optional(),
   transactionId: z.union([z.string(), z.number()]).optional(),
   status: z.string().optional(),
   transactionState: z.string().optional(),
-  transactionType: z.string().optional(),
+  amount: z.number().optional(),
   value: z.number().optional(),
   event: z.string().optional(),
+  pix: z
+    .object({
+      id: z.string().optional(),
+      status: z.string().optional(),
+      amount: z.number().optional(),
+    })
+    .optional(),
 });
 
 function extractStatus(body: z.infer<typeof bodySchema>): string {
-  return String(body.status ?? body.transactionState ?? "PENDENTE");
+  return String(
+    body.status ??
+      body.transactionState ??
+      body.pix?.status ??
+      "PENDENTE",
+  );
 }
 
-function secretMatches(provided: string | null, expected: string): boolean {
-  if (!provided) return false;
-  const a = Buffer.from(provided);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
+function extractTransactionId(body: z.infer<typeof bodySchema>): string {
+  const candidates = [
+    body.id,
+    body.pix?.id,
+    body.transactionId != null ? String(body.transactionId) : undefined,
+  ];
+  for (const c of candidates) {
+    if (c && typeof c === "string" && c.trim()) return c.trim();
+  }
+  return "";
+}
+
+function extractAmount(body: z.infer<typeof bodySchema>): number | undefined {
+  return body.amount ?? body.pix?.amount ?? body.value;
 }
 
 function amountsMatch(expectedBrl: number, observed: number | undefined): boolean {
-  if (observed === undefined) return true; // gateway às vezes omite value
+  if (observed === undefined) return true;
   if (!Number.isFinite(observed) || observed <= 0) return false;
   return Math.abs(observed - expectedBrl) < 0.02;
 }
 
 export async function POST(request: Request) {
-  const configuredSecret = process.env.MISTICPAY_WEBHOOK_SECRET?.trim();
-  if (!configuredSecret) {
-    console.error("[webhook/misticpay] MISTICPAY_WEBHOOK_SECRET não configurado.");
-    return NextResponse.json(
-      { error: "Webhook não configurado." },
-      { status: 503 },
-    );
-  }
-
-  const { searchParams } = new URL(request.url);
-  const provided =
-    request.headers.get("x-webhook-secret") ?? searchParams.get("secret");
-
-  if (!secretMatches(provided, configuredSecret)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   let raw: unknown;
   try {
     raw = await request.json();
@@ -71,23 +74,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, ignored: true });
   }
 
-  const misticId = body.transactionId != null ? String(body.transactionId) : "";
-  if (!misticId) {
-    return NextResponse.json({ error: "transactionId ausente." }, { status: 400 });
+  const transactionId = extractTransactionId(body);
+  if (!transactionId) {
+    return NextResponse.json(
+      { error: "transactionId ausente." },
+      { status: 400 },
+    );
   }
 
   const status = normalizePaymentStatus(extractStatus(body));
   const order =
-    (await findOrderByMisticId(misticId)) ??
-    (misticId.startsWith("hlw_") ? await getOrder(misticId) : null);
+    (await findOrderByTransactionId(transactionId)) ??
+    (transactionId.startsWith("hlw_") ? await getOrder(transactionId) : null);
 
   if (!order) {
     return NextResponse.json({ ok: true, matched: false });
   }
 
-  if (status === "COMPLETO" && !amountsMatch(order.amountBrl, body.value)) {
+  const observedAmount = extractAmount(body);
+  if (status === "COMPLETO" && !amountsMatch(order.amountBrl, observedAmount)) {
     console.error(
-      `[webhook/misticpay] Valor divergente pedido=${order.id} esperado=${order.amountBrl} recebido=${body.value}`,
+      `[webhook/sevenpay] Valor divergente pedido=${order.id} esperado=${order.amountBrl} recebido=${observedAmount}`,
     );
     return NextResponse.json(
       { error: "Valor do pagamento não confere." },

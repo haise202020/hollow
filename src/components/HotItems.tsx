@@ -14,7 +14,7 @@ export function HotItems() {
         </h2>
         <Link
           href="/gamepasses"
-          className="text-sm font-semibold text-[var(--purple-bright)] transition hover:text-white"
+          className="text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-bright)]"
         >
           Ver todos
         </Link>
@@ -25,7 +25,7 @@ export function HotItems() {
           <Link
             key={item.id}
             href={`/gamepasses/${item.id}`}
-            className="relative z-0 flex cursor-pointer select-none flex-col overflow-hidden rounded-2xl border-2 border-[#2a2a32] bg-[#121218] transition duration-200 hover:z-10 hover:scale-[1.04] hover:border-[var(--purple)]"
+            className="relative flex cursor-pointer select-none flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-[var(--bg-panel)] transition duration-200 hover:border-[var(--accent)]/40 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.02]"
           >
             <div className="relative aspect-video bg-[#0d0d12]">
               <Image
@@ -51,7 +51,7 @@ export function HotItems() {
                 discountLabel={item.discountLabel}
               />
 
-              <span className="mt-3.5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--purple)] px-3 py-2.5 text-[13px] font-bold text-white transition hover:bg-[var(--purple-bright)]">
+              <span className="mt-3.5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-3 py-2.5 text-[13px] font-semibold text-[#08090d] transition hover:bg-[var(--accent-bright)]">
                 <BasketIcon className="h-4 w-4" />
                 Comprar agora
               </span>
