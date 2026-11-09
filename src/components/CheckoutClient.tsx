@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { gamepassPriceForNetRobux } from "@/lib/data/catalog";
 import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/security/constants";
@@ -198,6 +199,7 @@ export function CheckoutClient({
   const [step, setStep] = useState<Step>("username");
   const [error, setError] = useState("");
   const [order, setOrder] = useState<CheckoutOrder | null>(null);
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [generatedQr, setGeneratedQr] = useState<string | null>(null);
 
@@ -233,12 +235,14 @@ export function CheckoutClient({
         if (cancelled || !res.ok || !data.order) return;
         setOrder(data.order);
         setRobloxUsername(data.order.robloxUsername ?? "");
-        setStep(
+        if (
           data.order.status === "COMPLETO" ||
-            (data.order.adminStatus ?? "AGUARDANDO") === "APROVADO"
-            ? "paid"
-            : "pix",
-        );
+          (data.order.adminStatus ?? "AGUARDANDO") === "APROVADO"
+        ) {
+          router.replace(`/chat/${resumeOrderId}`);
+          return;
+        }
+        setStep("pix");
       } catch {
         // silencioso — polling existente cuidará de retries
       }
@@ -298,15 +302,17 @@ export function CheckoutClient({
           data.order.status === "COMPLETO" ||
           (data.order.adminStatus ?? "AGUARDANDO") === "APROVADO"
         ) {
-          setStep("paid");
+          router.replace(`/chat/${orderId}`);
+          return;
         }
         if (
           data.order.status === "FALHA" ||
           data.order.status === "CANCELADO"
         ) {
-          // Se o admin já aprovou, prioriza a liberação do pedido.
+          // Se o admin já aprovou, redireciona direto ao chat.
           if ((data.order.adminStatus ?? "AGUARDANDO") === "APROVADO") {
-            setStep("paid");
+            router.replace(`/chat/${orderId}`);
+            return;
           } else {
             setError(
               "Pagamento não concluído. Gere um novo PIX para tentar de novo.",
@@ -333,6 +339,7 @@ export function CheckoutClient({
     order?.status,
     order?.adminStatus,
     step,
+    router,
   ]);
 
   async function checkGamepass(silent = false) {
