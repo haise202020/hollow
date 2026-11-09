@@ -6,7 +6,7 @@ const HERO_IMAGE = "/hero-mascote-v2.webp";
 
 export function Hero() {
   return (
-    <section className="site-container relative z-0 grid items-center gap-10 py-12 md:grid-cols-2 md:gap-8 md:py-20 lg:py-24">
+    <section className="site-container relative z-0 grid items-center gap-10 pt-8 pb-12 md:grid-cols-2 md:gap-8 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24">
       {/* Ambient glow — subtle, not overwhelming */}
       <div
         aria-hidden
@@ -17,7 +17,7 @@ export function Hero() {
         }}
       />
 
-      <div className="relative z-10">
+      <div className="relative z-20">
         <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
           Robux e Gamepasses{" "}
           <span className="text-[var(--accent)]">sem complicação.</span>
@@ -50,7 +50,7 @@ export function Hero() {
         </p>
       </div>
 
-      <div className="relative z-0 mx-auto min-w-0 w-full max-w-[640px]">
+      <div className="relative z-10 mx-auto min-w-0 w-full max-w-[640px]">
         <div className="relative aspect-[1359/1158] overflow-hidden">
           <Image
             src={HERO_IMAGE}
