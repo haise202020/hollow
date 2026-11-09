@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
+import { isAdminDiscordId } from "@/lib/auth/admin";
 import { formatBrl } from "@/lib/data/catalog";
 import {
   getOrder,
@@ -47,8 +48,9 @@ export async function GET(request: Request) {
   const ownerOk = Boolean(
     session?.sub && order.accountUserId && session.sub === order.accountUserId,
   );
+  const adminOk = isAdminDiscordId(session?.discordId);
 
-  if (!tokenOk && !ownerOk) {
+  if (!tokenOk && !ownerOk && !adminOk) {
     return NextResponse.json({ error: "Pedido não encontrado." }, { status: 404 });
   }
 
@@ -90,6 +92,8 @@ export async function GET(request: Request) {
       amountBrl: fresh.amountBrl,
       amountFormatted: formatBrl(fresh.amountBrl),
       robloxUsername: fresh.robloxUsername,
+      robloxGamepassId: fresh.robloxGamepassId ?? null,
+      createdAt: fresh.createdAt,
       copyPaste: fresh.copyPaste,
       qrCodeBase64: fresh.qrCodeBase64,
       qrcodeUrl: fresh.qrcodeUrl,
