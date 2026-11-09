@@ -24,6 +24,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
+  const lastMessageIdsRef = useRef<string>("");
 
   useEffect(() => {
     async function load() {
@@ -69,11 +70,20 @@ export function ChatClient({ orderId }: { orderId: string }) {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Só faz scroll automático se o usuário já estava perto do fundo
+  // Só faz scroll automático dentro do container do chat quando há novas mensagens
+  // e o usuário já estava perto do fundo. Usa scrollTop para não mover a página inteira.
   useEffect(() => {
-    if (isNearBottomRef.current) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    const ids = messages.map((m) => m.id).join(",");
+    if (ids === lastMessageIdsRef.current) return;
+    lastMessageIdsRef.current = ids;
+
+    if (!isNearBottomRef.current) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
   }, [messages]);
 
   async function sendMessage(e: FormEvent) {
