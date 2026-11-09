@@ -13,7 +13,7 @@ function normalizeAbsoluteUrl(raw: string, fallback: string): string {
 export function getSiteUrl(): string {
   return normalizeAbsoluteUrl(
     process.env.NEXT_PUBLIC_SITE_URL ?? "",
-    "http://localhost:3000",
+    "https://hollow-beta.vercel.app/api/auth/discord/callback",
   );
 }
 
