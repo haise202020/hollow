@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -88,9 +89,16 @@ export function LoginClient() {
       <section className="relative flex min-h-screen flex-col px-8 py-7 sm:px-12 lg:px-16">
         <Link
           href="/"
-          className="font-display text-lg font-bold tracking-tight text-white transition hover:text-[var(--accent)]"
+          className="flex items-center transition opacity-90 hover:opacity-100"
         >
-          hollow
+          <Image
+            src="/logo.png"
+            alt="Hollow"
+            width={32}
+            height={32}
+            priority
+            className="h-8 w-auto"
+          />
         </Link>
 
         <div className="mx-auto flex w-full max-w-[360px] flex-1 flex-col justify-center py-10">

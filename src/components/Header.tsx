@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -151,9 +152,16 @@ export function Header() {
       <div className="site-container relative flex h-[72px] items-center justify-between md:h-20">
         <Link
           href="/"
-          className="relative z-10 font-display text-[1.65rem] font-bold tracking-tight text-white"
+          className="relative z-10 flex items-center"
         >
-          hollow
+          <Image
+            src="/logo.png"
+            alt="Hollow"
+            width={36}
+            height={36}
+            priority
+            className="h-9 w-auto"
+          />
         </Link>
 
         <nav
