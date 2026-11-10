@@ -60,7 +60,7 @@ export function Header() {
   // Detecta scroll para ativar modo pílula
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 30);
     }
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -146,7 +146,6 @@ export function Header() {
   }
 
   const label = user?.displayName || user?.username;
-
   const isAdmin = isAdminDiscordId(user?.discordId);
 
   const menuItems = [
@@ -159,257 +158,293 @@ export function Header() {
   ];
 
   return (
-    <header
-      className={`fixed top-0 right-0 left-0 z-[80] transition-all duration-500 ease-out ${
-        scrolled
-          ? "py-3"
-          : "py-0"
-      }`}
-    >
-      {/* Glass container — morphs between full-width bar and floating pill */}
+    <>
+      {/* Spacer to prevent content jump — matches header height */}
       <div
-        className={`mx-auto transition-all duration-500 ease-out ${
-          scrolled
-            ? "max-w-4xl rounded-full border border-white/[0.08] bg-[#07070a]/70 px-6 shadow-[0_8px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl"
-            : "w-full border-b border-white/[0.06] bg-[#07070a]/80 px-0 backdrop-blur-xl"
-        }`}
-      >
-        <div className="site-container relative flex h-[60px] items-center justify-between md:h-[64px]">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="relative z-10 flex shrink-0 items-center gap-2.5"
+        className="transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        style={{ height: scrolled ? 76 : 80 }}
+      />
+
+      <header className="fixed top-0 right-0 left-0 z-[80]">
+        {/* Outer wrapper handles vertical position + padding animation */}
+        <div
+          className="transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{
+            paddingTop: scrolled ? 12 : 0,
+            paddingBottom: scrolled ? 12 : 0,
+          }}
+        >
+          {/* Glass container — morphs between full bar and floating pill */}
+          <div
+            className="mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{
+              maxWidth: scrolled ? "56rem" : "100%",
+              borderRadius: scrolled ? 9999 : 0,
+              borderWidth: scrolled ? 1 : 0,
+              borderStyle: "solid",
+              borderColor: scrolled
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(255,255,255,0.06)",
+              borderBottomWidth: scrolled ? 1 : 1,
+              background: scrolled
+                ? "rgba(7,7,10,0.65)"
+                : "rgba(7,7,10,0.8)",
+              backdropFilter: scrolled ? "blur(40px)" : "blur(24px)",
+              WebkitBackdropFilter: scrolled ? "blur(40px)" : "blur(24px)",
+              boxShadow: scrolled
+                ? "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset"
+                : "none",
+              paddingLeft: scrolled ? 24 : 0,
+              paddingRight: scrolled ? 24 : 0,
+            }}
           >
-            <Image
-              src="/logo.png"
-              alt="Hollow"
-              width={36}
-              height={36}
-              priority
-              className={`transition-all duration-500 ${
-                scrolled ? "h-8 w-auto" : "h-9 w-auto"
-              }`}
-            />
-            <span
-              className={`font-display font-bold tracking-tight text-white transition-all duration-500 ${
-                scrolled ? "text-lg" : "text-xl"
-              }`}
+            <div className="site-container relative flex items-center justify-between transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{ height: scrolled ? 52 : 72 }}
             >
-              hollow
-            </span>
-          </Link>
-
-          {/* Desktop nav */}
-          <nav
-            ref={navRef}
-            className={`absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-white/[0.08] bg-[#0c0c12]/90 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-500 md:flex ${
-              scrolled ? "scale-95 opacity-100" : "scale-100 opacity-100"
-            }`}
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute top-1.5 bottom-1.5 rounded-full bg-white/[0.08] transition-all duration-300 ease-out"
-              style={{
-                left: indicator.left,
-                width: indicator.width,
-                opacity: indicator.ready ? 1 : 0,
-              }}
-            />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute bottom-[7px] h-[2px] rounded-full bg-[var(--accent-bright)] transition-all duration-300 ease-out"
-              style={{
-                left: indicator.left + Math.max((indicator.width - 20) / 2, 0),
-                width: 20,
-                opacity: indicator.ready ? 1 : 0,
-              }}
-            />
-
-            {navItems.map((item) => {
-              const active = isActivePath(pathname, item.href);
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  ref={(el) => {
-                    itemRefs.current[item.href] = el;
+              {/* Logo */}
+              <Link
+                href="/"
+                className="relative z-10 flex shrink-0 items-center gap-2.5"
+              >
+                <Image
+                  src="/logo.png"
+                  alt="Hollow"
+                  width={36}
+                  height={36}
+                  priority
+                  className="transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{
+                    height: scrolled ? 28 : 36,
+                    width: "auto",
                   }}
-                  className={`relative z-10 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
-                    active
-                      ? "text-white"
-                      : "text-[var(--fg-muted)] hover:text-white"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Right side — user menu or login */}
-          <div className="relative z-10 flex items-center gap-2">
-            {user ? (
-              <div className="relative hidden sm:block" ref={menuRef}>
-                <button
-                  type="button"
-                  aria-expanded={menuOpen}
-                  aria-haspopup="menu"
-                  onClick={() => {
-                    prefetchAccountData();
-                    setMenuOpen((value) => !value);
+                />
+                <span
+                  className="font-display font-bold tracking-tight text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{
+                    fontSize: scrolled ? "1rem" : "1.25rem",
+                    opacity: scrolled ? 0.9 : 1,
                   }}
-                  className={`inline-flex items-center gap-2 rounded-xl border bg-white/[0.03] py-1 pl-1 pr-2.5 transition ${
-                    menuOpen
-                      ? "border-[var(--accent-bright)]"
-                      : "border-white/[0.08] hover:border-[var(--accent)]/40"
-                  }`}
                 >
-                  {user.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.avatarUrl}
-                      alt=""
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent)]/20 text-xs font-bold text-[var(--accent-bright)]">
-                      {(label || "?").slice(0, 1).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="max-w-[110px] truncate text-sm font-medium text-white">
-                    {label}
-                  </span>
-                  <ChevronIcon
-                    className={`h-4 w-4 text-[var(--fg-muted)] transition ${
-                      menuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+                  hollow
+                </span>
+              </Link>
 
-                {menuOpen ? (
-                  <div
-                    role="menu"
-                    className="user-menu-enter absolute right-0 mt-2 w-[220px] overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101014]/95 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl"
-                    onMouseEnter={() => {
-                      prefetchAccountData();
-                    }}
-                  >
-                    {menuItems.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          role="menuitem"
-                          onClick={() => setMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/90 transition hover:bg-white/[0.05]"
-                        >
-                          <Icon className="h-4 w-4 text-[var(--fg-muted)]" />
-                          {item.label}
-                        </Link>
-                      );
-                    })}
-                    <div className="my-1 h-px bg-white/[0.06]" />
+              {/* Desktop nav */}
+              <nav
+                ref={navRef}
+                className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-white/[0.08] bg-[#0c0c12]/90 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:flex"
+                style={{
+                  transform: scrolled
+                    ? "translate(-50%, -50%) scale(0.92)"
+                    : "translate(-50%, -50%) scale(1)",
+                }}
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-1.5 bottom-1.5 rounded-full bg-white/[0.08] transition-all duration-300 ease-out"
+                  style={{
+                    left: indicator.left,
+                    width: indicator.width,
+                    opacity: indicator.ready ? 1 : 0,
+                  }}
+                />
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute bottom-[7px] h-[2px] rounded-full bg-[var(--accent-bright)] transition-all duration-300 ease-out"
+                  style={{
+                    left: indicator.left + Math.max((indicator.width - 20) / 2, 0),
+                    width: 20,
+                    opacity: indicator.ready ? 1 : 0,
+                  }}
+                />
+
+                {navItems.map((item) => {
+                  const active = isActivePath(pathname, item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      ref={(el) => {
+                        itemRefs.current[item.href] = el;
+                      }}
+                      className={`relative z-10 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
+                        active
+                          ? "text-white"
+                          : "text-[var(--fg-muted)] hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Right side */}
+              <div className="relative z-10 flex items-center gap-2">
+                {user ? (
+                  <div className="relative hidden sm:block" ref={menuRef}>
                     <button
                       type="button"
-                      role="menuitem"
-                      onClick={() => void logout()}
-                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-rose-300 transition hover:bg-rose-500/10"
+                      aria-expanded={menuOpen}
+                      aria-haspopup="menu"
+                      onClick={() => {
+                        prefetchAccountData();
+                        setMenuOpen((value) => !value);
+                      }}
+                      className={`inline-flex items-center gap-2 rounded-xl border bg-white/[0.03] py-1 pl-1 pr-2.5 transition ${
+                        menuOpen
+                          ? "border-[var(--accent-bright)]"
+                          : "border-white/[0.08] hover:border-[var(--accent)]/40"
+                      }`}
                     >
-                      <LogoutIcon className="h-4 w-4" />
-                      Encerrar sessão
+                      {user.avatarUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={user.avatarUrl}
+                          alt=""
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent)]/20 text-xs font-bold text-[var(--accent-bright)]">
+                          {(label || "?").slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
+                      <span className="max-w-[110px] truncate text-sm font-medium text-white">
+                        {label}
+                      </span>
+                      <ChevronIcon
+                        className={`h-4 w-4 text-[var(--fg-muted)] transition ${
+                          menuOpen ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className={`hidden rounded-lg bg-[var(--accent)] font-semibold text-[#08090d] transition hover:bg-[var(--accent-bright)] hover:shadow-[0_0_20px_var(--accent-glow)] sm:inline-flex ${
-                  scrolled ? "px-4 py-2 text-sm" : "px-5 py-2.5 text-sm"
-                }`}
-              >
-                Entrar
-              </Link>
-            )}
 
-            {/* Mobile hamburger */}
-            <button
-              type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white md:hidden"
-              aria-label={open ? "Fechar menu" : "Abrir menu"}
-              aria-expanded={open}
-              onClick={() => setOpen((value) => !value)}
-            >
-              <span className="sr-only">Menu</span>
-              <div className="space-y-1.5">
-                <span className="block h-0.5 w-4 bg-white" />
-                <span className="block h-0.5 w-4 bg-white" />
-                <span className="block h-0.5 w-4 bg-white" />
+                    {menuOpen ? (
+                      <div
+                        role="menu"
+                        className="user-menu-enter absolute right-0 mt-2 w-[220px] overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101014]/95 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+                        onMouseEnter={() => {
+                          prefetchAccountData();
+                        }}
+                      >
+                        {menuItems.map((item) => {
+                          const Icon = item.icon;
+                          return (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              role="menuitem"
+                              onClick={() => setMenuOpen(false)}
+                              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/90 transition hover:bg-white/[0.05]"
+                            >
+                              <Icon className="h-4 w-4 text-[var(--fg-muted)]" />
+                              {item.label}
+                            </Link>
+                          );
+                        })}
+                        <div className="my-1 h-px bg-white/[0.06]" />
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => void logout()}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-rose-300 transition hover:bg-rose-500/10"
+                        >
+                          <LogoutIcon className="h-4 w-4" />
+                          Encerrar sessão
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="hidden rounded-lg bg-[var(--accent)] font-semibold text-[#08090d] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--accent-bright)] hover:shadow-[0_0_20px_var(--accent-glow)] sm:inline-flex"
+                    style={{
+                      padding: scrolled ? "8px 16px" : "10px 20px",
+                      fontSize: scrolled ? "0.8125rem" : "0.875rem",
+                    }}
+                  >
+                    Entrar
+                  </Link>
+                )}
+
+                {/* Mobile hamburger */}
+                <button
+                  type="button"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white md:hidden"
+                  aria-label={open ? "Fechar menu" : "Abrir menu"}
+                  aria-expanded={open}
+                  onClick={() => setOpen((value) => !value)}
+                >
+                  <span className="sr-only">Menu</span>
+                  <div className="space-y-1.5">
+                    <span className="block h-0.5 w-4 bg-white" />
+                    <span className="block h-0.5 w-4 bg-white" />
+                    <span className="block h-0.5 w-4 bg-white" />
+                  </div>
+                </button>
               </div>
-            </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile menu dropdown */}
-      {open ? (
-        <div className="fixed inset-x-0 top-[72px] z-[79] border-t border-white/5 bg-[#0c0c11]/95 backdrop-blur-xl md:hidden">
-          <nav className="site-container flex flex-col gap-1 py-3">
-            {navItems.map((item) => {
-              const active = isActivePath(pathname, item.href);
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={`rounded-full px-4 py-2.5 text-sm transition-colors duration-300 ${
-                    active
-                      ? "bg-white/[0.08] text-white"
-                      : "text-[var(--fg-muted)] hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-            {user ? (
-              <>
-                {menuItems.map((item) => (
+        {/* Mobile menu dropdown */}
+        {open ? (
+          <div className="fixed inset-x-0 top-[72px] z-[79] border-t border-white/5 bg-[#0c0c11]/95 backdrop-blur-xl md:hidden">
+            <nav className="site-container flex flex-col gap-1 py-3">
+              {navItems.map((item) => {
+                const active = isActivePath(pathname, item.href);
+                return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="rounded-full px-4 py-2.5 text-sm text-[var(--accent-bright)] hover:bg-white/5"
+                    className={`rounded-full px-4 py-2.5 text-sm transition-colors duration-300 ${
+                      active
+                        ? "bg-white/[0.08] text-white"
+                        : "text-[var(--fg-muted)] hover:bg-white/5 hover:text-white"
+                    }`}
                   >
                     {item.label}
                   </Link>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    void logout();
-                  }}
-                  className="rounded-full px-4 py-2.5 text-left text-sm text-rose-300 hover:bg-white/5"
+                );
+              })}
+              {user ? (
+                <>
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className="rounded-full px-4 py-2.5 text-sm text-[var(--accent-bright)] hover:bg-white/5"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      void logout();
+                    }}
+                    className="rounded-full px-4 py-2.5 text-left text-sm text-rose-300 hover:bg-white/5"
+                  >
+                    Encerrar sessão
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full bg-[var(--accent)] px-4 py-2.5 text-center text-sm font-semibold text-white"
                 >
-                  Encerrar sessão
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="rounded-full bg-[var(--accent)] px-4 py-2.5 text-center text-sm font-semibold text-white"
-              >
-                Entrar
-              </Link>
-            )}
-          </nav>
-        </div>
-      ) : null}
-    </header>
+                  Entrar
+                </Link>
+              )}
+            </nav>
+          </div>
+        ) : null}
+      </header>
+    </>
   );
 }
