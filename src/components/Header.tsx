@@ -161,14 +161,14 @@ export function Header() {
     <>
       {/* Spacer to prevent content jump — matches header height */}
       <div
-        className="transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        className="will-change-[height] transition-[height] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{ height: scrolled ? 76 : 80 }}
       />
 
       <header className="fixed top-0 right-0 left-0 z-[80]">
         {/* Outer wrapper handles vertical position + padding animation */}
         <div
-          className="transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          className="will-change-[padding] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{
             paddingTop: scrolled ? 12 : 0,
             paddingBottom: scrolled ? 12 : 0,
@@ -176,7 +176,7 @@ export function Header() {
         >
           {/* Glass container — morphs between full bar and floating pill */}
           <div
-            className="relative mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            className="relative mx-auto will-change-transform transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
             style={{
               maxWidth: scrolled ? "56rem" : "100%",
               borderRadius: scrolled ? 9999 : 0,
@@ -201,7 +201,7 @@ export function Header() {
             {/* Desktop nav — positioned relative to glass container, always centered */}
             <nav
               ref={navRef}
-              className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-white/[0.08] bg-[#0c0c12]/90 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:flex"
+              className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-white/[0.08] bg-[#0c0c12]/90 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] will-change-transform transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] md:flex"
             >
               <span
                 aria-hidden
@@ -244,7 +244,7 @@ export function Header() {
             </nav>
 
             <div
-              className="site-container relative flex items-center justify-between transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="site-container relative flex items-center justify-between will-change-[height] transition-[height] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{ height: scrolled ? 52 : 72 }}
             >
               {/* Logo */}
@@ -258,14 +258,14 @@ export function Header() {
                   width={36}
                   height={36}
                   priority
-                  className="transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  className="will-change-transform transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
                   style={{
                     height: scrolled ? 28 : 36,
                     width: "auto",
                   }}
                 />
                 <span
-                  className="font-display font-bold tracking-tight text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  className="font-display font-bold tracking-tight text-white will-change-[font-size,opacity] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
                   style={{
                     fontSize: scrolled ? "1rem" : "1.25rem",
                     opacity: scrolled ? 0.9 : 1,
@@ -354,7 +354,7 @@ export function Header() {
                 ) : (
                   <Link
                     href="/login"
-                    className="hidden rounded-lg bg-[var(--accent)] font-semibold text-[#08090d] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--accent-bright)] hover:shadow-[0_0_20px_var(--accent-glow)] sm:inline-flex"
+                    className="hidden rounded-lg bg-[var(--accent)] font-semibold text-[#08090d] will-change-transform transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-[var(--accent-bright)] hover:shadow-[0_0_20px_var(--accent-glow)] sm:inline-flex"
                     style={{
                       padding: scrolled ? "8px 16px" : "10px 20px",
                       fontSize: scrolled ? "0.8125rem" : "0.875rem",
