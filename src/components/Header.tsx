@@ -152,16 +152,19 @@ export function Header() {
       <div className="site-container relative flex h-[72px] items-center justify-between md:h-20">
         <Link
           href="/"
-          className="relative z-10 flex items-center transition opacity-90 hover:opacity-100"
+          className="relative z-10 flex items-center gap-2.5"
         >
           <Image
-            src="/logo-header.png"
+            src="/logo.png"
             alt="Hollow"
-            width={140}
-            height={40}
+            width={36}
+            height={36}
             priority
             className="h-9 w-auto"
           />
+          <span className="font-display text-xl font-bold tracking-tight text-white">
+            hollow
+          </span>
         </Link>
 
         <nav
