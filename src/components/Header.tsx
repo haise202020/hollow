@@ -152,7 +152,7 @@ export function Header() {
       <div className="site-container relative flex h-[72px] items-center justify-between md:h-20">
         <Link
           href="/"
-          className="relative z-10 flex items-center"
+          className="relative z-10 flex items-center gap-2.5"
         >
           <Image
             src="/logo.png"
@@ -162,6 +162,9 @@ export function Header() {
             priority
             className="h-9 w-auto"
           />
+          <span className="font-display text-xl font-bold tracking-tight text-white">
+            hollow
+          </span>
         </Link>
 
         <nav
