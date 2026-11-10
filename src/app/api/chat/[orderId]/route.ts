@@ -3,8 +3,6 @@ import { getSession } from "@/lib/auth/session";
 import { getChatMessages, addChatMessage } from "@/lib/chat/store";
 import { isAdminDiscordId } from "@/lib/auth/admin";
 import { findOrderById } from "@/lib/orders/store";
-import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
-import { sanitizeText } from "@/lib/security/sanitize";
 
 export async function GET(
   _request: Request,
@@ -55,25 +53,11 @@ export async function POST(
     return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
   }
 
-  // Rate limiting por usuário (não admin) para prevenir spam/flood
-  if (!isAdmin) {
-    const ip = getClientIp(request.headers);
-    const chatKey = `chat-msg:${session.sub}:${ip}`;
-    const limited = rateLimit(chatKey, 10, 60_000); // 10 mensagens/minuto
-    if (!limited.success) {
-      return NextResponse.json(
-        { error: "Muitas mensagens. Aguarde um momento." },
-        { status: 429 },
-      );
-    }
-  }
-
   const body = (await request.json()) as { content?: string };
-  const rawContent = String(body.content ?? "");
-  const content = sanitizeText(rawContent, 2000);
-  if (!content) {
+  const content = (body.content ?? "").trim();
+  if (!content || content.length > 2000) {
     return NextResponse.json(
-      { error: "Mensagem vazia ou inválida." },
+      { error: "Mensagem vazia ou muito longa." },
       { status: 400 },
     );
   }

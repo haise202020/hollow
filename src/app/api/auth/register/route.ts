@@ -3,7 +3,6 @@ import { z } from "zod";
 import { apiError } from "@/lib/api/response";
 import { isReservedUsername } from "@/lib/auth/types";
 import { hashPassword } from "@/lib/auth/password";
-import { validatePasswordStrength } from "@/lib/auth/common-passwords";
 import {
   createSessionToken,
   setSessionCookie,
@@ -81,12 +80,6 @@ export async function POST(request: Request) {
       },
       { status: 409 },
     );
-  }
-
-  // Validação de força da senha (bloqueia senhas comuns e fracas)
-  const passwordError = validatePasswordStrength(parsed.data.password);
-  if (passwordError) {
-    return NextResponse.json({ error: passwordError }, { status: 422 });
   }
 
   try {
