@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { AuthUser } from "./types";
 import { resolveDisplayName } from "./types";
+import { isSessionRevoked, tokenToJti } from "./session-blacklist";
 
 export const SESSION_COOKIE = "hollow_session";
 const SESSION_DAYS = 14;
@@ -50,6 +51,10 @@ export async function readSessionToken(
   token: string,
 ): Promise<SessionPayload | null> {
   try {
+    // Verifica se o token foi revogado (logout server-side) ANTES de validar
+    const jti = tokenToJti(token);
+    if (isSessionRevoked(jti)) return null;
+
     const { payload } = await jwtVerify(token, getAuthSecret());
     if (!payload.sub || typeof payload.username !== "string") return null;
 

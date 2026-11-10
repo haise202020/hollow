@@ -18,7 +18,7 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+      `script-src 'self'${isProd ? "" : " 'unsafe-eval'"}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://i.imgur.com https://api.qrserver.com https://*.rbxcdn.com https://thumbnails.roblox.com https://cdn.discordapp.com https://*.sevenpay.ltda",
       "font-src 'self' data:",

@@ -6,6 +6,7 @@ import {
   updateOrderStatus,
 } from "@/lib/orders/store";
 import { normalizePaymentStatus } from "@/lib/payments/sevenpay";
+import { timingSafeEqual } from "node:crypto";
 
 const bodySchema = z.object({
   id: z.string().optional(),
@@ -55,10 +56,82 @@ function amountsMatch(expectedBrl: number, observed: number | undefined): boolea
   return Math.abs(observed - expectedBrl) < 0.02;
 }
 
+/**
+ * Valida assinatura do webhook usando HMAC-SHA256.
+ * O gateway deve enviar header X-Signature com HMAC do body.
+ */
+async function verifyWebhookSignature(
+  request: Request,
+  body: string,
+): Promise<boolean> {
+  const secret = process.env.SEVENPAY_WEBHOOK_SECRET?.trim();
+
+  // Se não há secret configurado, log warning mas permite (backward compat)
+  if (!secret) {
+    console.warn(
+      "[webhook] SEVENPAY_WEBHOOK_SECRET não configurado. Webhook sem autenticação!",
+    );
+    return true;
+  }
+
+  const signature = request.headers.get("x-signature");
+  if (!signature) {
+    console.error("[webhook] Header X-Signature ausente");
+    return false;
+  }
+
+  try {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
+    const expectedSignature = await crypto.subtle.sign(
+      "HMAC",
+      key,
+      encoder.encode(body),
+    );
+
+    const expectedHex = Array.from(new Uint8Array(expectedSignature))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    // Timing-safe comparison
+    const sigBuffer = Buffer.from(signature, "hex");
+    const expectedBuffer = Buffer.from(expectedHex, "hex");
+
+    if (sigBuffer.length !== expectedBuffer.length) {
+      console.error("[webhook] Tamanho de assinatura inválido");
+      return false;
+    }
+
+    return timingSafeEqual(sigBuffer, expectedBuffer);
+  } catch (error) {
+    console.error("[webhook] Erro ao validar assinatura:", error);
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
+  // Ler body como texto para validar assinatura
+  const bodyText = await request.text();
+
+  // Validar assinatura do webhook ANTES de processar
+  const signatureValid = await verifyWebhookSignature(request, bodyText);
+  if (!signatureValid) {
+    console.error("[webhook] Assinatura inválida - possível fraude");
+    return NextResponse.json(
+      { error: "Assinatura inválida." },
+      { status: 401 },
+    );
+  }
+
   let raw: unknown;
   try {
-    raw = await request.json();
+    raw = JSON.parse(bodyText);
   } catch {
     return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
   }
@@ -89,6 +162,17 @@ export async function POST(request: Request) {
 
   if (!order) {
     return NextResponse.json({ ok: true, matched: false });
+  }
+
+  // Idempotência: se já está COMPLETO, não processa novamente
+  if (order.status === "COMPLETO" && status === "COMPLETO") {
+    return NextResponse.json({
+      ok: true,
+      matched: true,
+      orderId: order.id,
+      status: order.status,
+      idempotent: true,
+    });
   }
 
   const observedAmount = extractAmount(body);
