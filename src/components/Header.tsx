@@ -176,7 +176,7 @@ export function Header() {
         >
           {/* Glass container — morphs between full bar and floating pill */}
           <div
-            className="mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            className="relative mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
             style={{
               maxWidth: scrolled ? "56rem" : "100%",
               borderRadius: scrolled ? 9999 : 0,
@@ -198,7 +198,53 @@ export function Header() {
               paddingRight: scrolled ? 24 : 0,
             }}
           >
-            <div className="site-container relative flex items-center justify-between transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            {/* Desktop nav — positioned relative to glass container, always centered */}
+            <nav
+              ref={navRef}
+              className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-white/[0.08] bg-[#0c0c12]/90 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:flex"
+            >
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1.5 bottom-1.5 rounded-full bg-white/[0.08] transition-all duration-300 ease-out"
+                style={{
+                  left: indicator.left,
+                  width: indicator.width,
+                  opacity: indicator.ready ? 1 : 0,
+                }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-[7px] h-[2px] rounded-full bg-[var(--accent-bright)] transition-all duration-300 ease-out"
+                style={{
+                  left: indicator.left + Math.max((indicator.width - 20) / 2, 0),
+                  width: 20,
+                  opacity: indicator.ready ? 1 : 0,
+                }}
+              />
+
+              {navItems.map((item) => {
+                const active = isActivePath(pathname, item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    ref={(el) => {
+                      itemRefs.current[item.href] = el;
+                    }}
+                    className={`relative z-10 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
+                      active
+                        ? "text-white"
+                        : "text-[var(--fg-muted)] hover:text-white"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div
+              className="site-container relative flex items-center justify-between transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{ height: scrolled ? 52 : 72 }}
             >
               {/* Logo */}
@@ -228,56 +274,6 @@ export function Header() {
                   hollow
                 </span>
               </Link>
-
-              {/* Desktop nav */}
-              <nav
-                ref={navRef}
-                className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-white/[0.08] bg-[#0c0c12]/90 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:flex"
-                style={{
-                  transform: scrolled
-                    ? "translate(-50%, -50%) scale(0.92)"
-                    : "translate(-50%, -50%) scale(1)",
-                }}
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute top-1.5 bottom-1.5 rounded-full bg-white/[0.08] transition-all duration-300 ease-out"
-                  style={{
-                    left: indicator.left,
-                    width: indicator.width,
-                    opacity: indicator.ready ? 1 : 0,
-                  }}
-                />
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute bottom-[7px] h-[2px] rounded-full bg-[var(--accent-bright)] transition-all duration-300 ease-out"
-                  style={{
-                    left: indicator.left + Math.max((indicator.width - 20) / 2, 0),
-                    width: 20,
-                    opacity: indicator.ready ? 1 : 0,
-                  }}
-                />
-
-                {navItems.map((item) => {
-                  const active = isActivePath(pathname, item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      ref={(el) => {
-                        itemRefs.current[item.href] = el;
-                      }}
-                      className={`relative z-10 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
-                        active
-                          ? "text-white"
-                          : "text-[var(--fg-muted)] hover:text-white"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </nav>
 
               {/* Right side */}
               <div className="relative z-10 flex items-center gap-2">
