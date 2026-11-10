@@ -213,7 +213,7 @@ export function Header() {
             {/* Desktop nav — positioned relative to glass container, always centered */}
             <nav
               ref={navRef}
-              className={`absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-white/[0.08] bg-[#0c0c12]/90 px-1.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-transform ${
+              className={`absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-transparent px-1.5 py-1.5 transition-transform ${
               scrolled
                 ? "duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 : "duration-[1500ms] ease-[cubic-bezier(0.25,1,0.5,1)]"
