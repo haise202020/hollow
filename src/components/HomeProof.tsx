@@ -15,8 +15,8 @@ const NOTIFICATIONS = [
 
 type NotifItem = (typeof NOTIFICATIONS)[number] & { key: number; entering: boolean };
 
-/* ─── Inclinação inicial 3D (perspectiva premium, voltada para a direita) ─── */
-const BASE_ROTATION = { x: 2, y: 7, z: 3 };
+/* ─── Inclinação inicial 3D (perspectiva premium, ângulo da referência) ─── */
+const BASE_ROTATION = { x: 4, y: 12, z: 6 };
 
 /* ─── Single notification card in the stack ─── */
 function NotifCard({
@@ -181,7 +181,7 @@ function PhoneMockup() {
         }}
       >
         {/* Phone outer shell */}
-        <div className="relative overflow-hidden rounded-[3.2rem] border-[3px] border-[#3a3a4a] bg-[#0d0d14] shadow-[20px_40px_80px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_60px_rgba(168,85,247,0.08)]">
+        <div className="relative overflow-hidden rounded-[3.2rem] border-[3px] border-[#3a3a4a] bg-[#0d0d14] shadow-[30px_50px_90px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_60px_rgba(168,85,247,0.08)]">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-[2px] rounded-[3rem] border border-white/[0.03]"
