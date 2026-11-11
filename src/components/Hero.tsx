@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CartIcon } from "./icons";
 
-const HERO_IMAGE = "/hero-avatar.webp";
+const HERO_IMAGE = "/hero-avatar.png";
 
 export function Hero() {
   return (
