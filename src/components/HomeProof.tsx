@@ -15,6 +15,9 @@ const NOTIFICATIONS = [
 
 type NotifItem = (typeof NOTIFICATIONS)[number] & { key: number; entering: boolean };
 
+/* ─── Inclinação inicial 3D (perspectiva premium) ─── */
+const BASE_ROTATION = { x: 2, y: -7, z: -3 };
+
 /* ─── Single notification card in the stack ─── */
 function NotifCard({
   notification,
@@ -104,7 +107,7 @@ function DynamicIsland() {
 /* ─── Interactive 3D Phone with Lock Screen ─── */
 function PhoneMockup() {
   const phoneRef = useRef<HTMLDivElement>(null);
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [rotation, setRotation] = useState({ x: BASE_ROTATION.x, y: BASE_ROTATION.y });
   const [stack, setStack] = useState<NotifItem[]>([]);
   const nextKey = useRef(0);
   const notifCycleIndex = useRef(0);
@@ -124,7 +127,7 @@ function PhoneMockup() {
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    setRotation({ x: 0, y: 0 });
+    setRotation({ x: BASE_ROTATION.x, y: BASE_ROTATION.y });
   }, []);
 
   // Notification stack cycle: new enters at top from above, old ones shift down, max 3
@@ -173,12 +176,12 @@ function PhoneMockup() {
         ref={phoneRef}
         className="relative transition-transform duration-300 ease-out"
         style={{
-          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${BASE_ROTATION.z}deg)`,
           transformStyle: "preserve-3d",
         }}
       >
         {/* Phone outer shell */}
-        <div className="relative overflow-hidden rounded-[3.2rem] border-[3px] border-[#3a3a4a] bg-[#0d0d14] shadow-[0_30px_80px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_60px_rgba(168,85,247,0.08)]">
+        <div className="relative overflow-hidden rounded-[3.2rem] border-[3px] border-[#3a3a4a] bg-[#0d0d14] shadow-[20px_40px_80px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_60px_rgba(168,85,247,0.08)]">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-[2px] rounded-[3rem] border border-white/[0.03]"
