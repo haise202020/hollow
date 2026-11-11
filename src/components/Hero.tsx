@@ -7,16 +7,6 @@ const HERO_IMAGE = "/hero-avatar.webp";
 export function Hero() {
   return (
     <section className="site-container relative z-0 grid items-center gap-10 pt-8 pb-12 md:grid-cols-2 md:gap-8 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24">
-      {/* Ambient glow — subtle, not overwhelming */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 right-0 h-[500px] w-[500px] rounded-full opacity-40 blur-[120px]"
-        style={{
-          background:
-            "radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)",
-        }}
-      />
-
       <div className="relative z-20">
         <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
           Robux e Gamepasses{" "}
