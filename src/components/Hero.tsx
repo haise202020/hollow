@@ -50,20 +50,20 @@ export function Hero() {
         </p>
       </div>
 
-      <div className="relative z-10 mx-auto min-w-0 w-full max-w-[640px]">
+      <div className="relative z-10 mx-auto min-w-0 w-full max-w-[768px]">
         <div className="relative aspect-[1359/1158] overflow-hidden">
           <Image
             src={HERO_IMAGE}
             alt="Avatar Hollow com Robux"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 640px"
+            sizes="(max-width: 768px) 100vw, 768px"
             className="object-contain object-center"
           />
           {/* Fade sutil de baixo para cima */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/40 to-transparent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/40 to-transparent"
           />
         </div>
       </div>
