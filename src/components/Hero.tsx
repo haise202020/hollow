@@ -44,7 +44,7 @@ export function Hero() {
       {/* Camada independente da imagem — flutua à direita sem comprimir o texto */}
       <div
         aria-hidden={false}
-        className="pointer-events-none absolute right-0 top-1/2 z-10 hidden w-[43vw] max-w-[860px] -translate-y-1/2 md:block"
+        className="pointer-events-none absolute right-0 top-1/2 z-10 hidden w-[43vw] max-w-[860px] -translate-y-1/2 md:block md:mr-[45px]"
         style={{ right: "min(0px, calc((100vw - 1180px) / -2))" }}
       >
         <div className="pointer-events-auto relative aspect-[2000/1516] w-full overflow-visible">
