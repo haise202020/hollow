@@ -44,7 +44,7 @@ export function Hero() {
       {/* Camada independente da imagem — flutua à direita sem comprimir o texto */}
       <div
         aria-hidden={false}
-        className="pointer-events-none absolute right-0 top-1/2 z-10 hidden w-[55vw] max-w-[1100px] -translate-y-1/2 md:block"
+        className="pointer-events-none absolute right-0 top-1/2 z-10 hidden w-[50vw] max-w-[990px] -translate-y-1/2 md:block"
         style={{ right: "min(0px, calc((100vw - 1180px) / -2))" }}
       >
         <div className="pointer-events-auto relative aspect-[2000/1516] w-full overflow-visible">
@@ -53,7 +53,7 @@ export function Hero() {
             alt="Avatar Hollow com Robux"
             fill
             priority
-            sizes="(min-width: 1280px) 1100px, 55vw"
+            sizes="(min-width: 1280px) 990px, 50vw"
             quality={100}
             unoptimized
             className="object-contain object-center"
