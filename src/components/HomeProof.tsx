@@ -15,8 +15,8 @@ const NOTIFICATIONS = [
 
 type NotifItem = (typeof NOTIFICATIONS)[number] & { key: number; entering: boolean };
 
-/* ─── Inclinação inicial 3D (perspectiva premium, ângulo da referência) ─── */
-const BASE_ROTATION = { x: 4, y: 12, z: 6 };
+/* ─── Inclinação inicial 3D (perspectiva sutil, ângulo da referência) ─── */
+const BASE_ROTATION = { x: 1, y: -5, z: -3 };
 
 /* ─── Single notification card in the stack ─── */
 function NotifCard({
