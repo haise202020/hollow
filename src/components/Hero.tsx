@@ -6,7 +6,7 @@ const HERO_IMAGE = "/hero-avatar.webp";
 
 export function Hero() {
   return (
-    <section className="site-container relative z-0 grid items-center gap-10 pt-8 pb-12 md:grid-cols-2 md:gap-8 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24">
+    <section className="site-container relative z-0 grid items-center gap-10 pt-8 pb-12 md:grid-cols-[2fr_3fr] md:gap-4 md:pt-12 md:pb-20 lg:gap-0 lg:pt-16 lg:pb-24">
       <div className="relative z-20">
         <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
           Robux e Gamepasses{" "}
@@ -40,14 +40,14 @@ export function Hero() {
         </p>
       </div>
 
-      <div className="relative z-30 mx-auto min-w-0 w-full max-w-[960px] md:-mr-[160px]">
+      <div className="relative z-30 mx-auto min-w-0 w-full md:-mr-[320px] lg:-mr-[420px]">
         <div className="relative aspect-[2000/1516] overflow-visible">
           <Image
             src={HERO_IMAGE}
             alt="Avatar Hollow com Robux"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 960px"
+            sizes="(max-width: 768px) 100vw, 1100px"
             quality={100}
             unoptimized
             className="object-contain object-center"
