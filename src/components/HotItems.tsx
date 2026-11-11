@@ -5,7 +5,7 @@ import { BasketIcon } from "./icons";
 import { ProductPriceRow } from "./ProductPriceRow";
 
 export function HotItems() {
-  const items = catalogByCategory("permanent").slice(0, 5);
+  const items = catalogByCategory("permanent").slice(0, 8);
   return (
     <section className="site-container relative overflow-visible py-14 md:py-16">
       <div className="mb-6 flex items-end justify-between gap-4">
