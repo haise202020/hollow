@@ -1,6 +1,6 @@
 export function HomeProof() {
   return (
-    <section className="relative bg-[#08060F]">
+    <section className="relative bg-[#07060B]">
       <div className="site-container py-20 md:py-28">
         <div className="grid gap-12 md:grid-cols-[1fr_1px_1fr] md:gap-16 lg:gap-24">
           {/* Coluna esquerda */}
@@ -11,7 +11,7 @@ export function HomeProof() {
                 aria-hidden
                 className="h-2 w-2 rounded-full bg-[#A855F7]"
               />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#B98AFF]">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#C084FC]">
                 Nossos diferenciais
               </span>
             </div>
@@ -90,7 +90,7 @@ function FeatureItem({
       }`}
     >
       {/* Número + Tag na mesma linha */}
-      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#B98AFF] tabular-nums">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C084FC] tabular-nums">
         {number} — {tag}
       </p>
 
