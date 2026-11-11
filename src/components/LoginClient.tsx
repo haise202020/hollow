@@ -232,109 +232,176 @@ export function LoginClient() {
         </footer>
       </section>
 
-      {/* Right panel — stats & activity dashboard */}
-      <aside className="relative hidden overflow-hidden border-l border-white/[0.06] bg-[#050505] lg:flex lg:items-center lg:justify-center lg:px-10 lg:py-12">
+      {/* Right panel — glassmorphism dashboard */}
+      <aside className="relative hidden overflow-hidden lg:flex lg:items-center lg:justify-center lg:px-10 lg:py-12">
+        {/* Background layers */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_20%,var(--accent-glow),transparent_55%)]"
+          className="pointer-events-none absolute inset-0 bg-[#05030e]"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(168,85,247,0.15),transparent_60%)]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_80%,rgba(88,101,242,0.08),transparent_50%)]"
+        />
+        {/* Subtle grid pattern */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
         />
 
-        <div className="relative w-full max-w-[480px]">
-          {/* Indicator dots */}
-          <div className="mb-6 flex justify-center gap-1.5">
-            <span className="h-0.5 w-8 rounded-full bg-[var(--accent)]" />
-            <span className="h-0.5 w-6 rounded-full bg-white/10" />
-            <span className="h-0.5 w-6 rounded-full bg-white/10" />
-          </div>
-
-          {/* Stats cards */}
-          <div className="grid grid-cols-3 gap-2.5">
+        <div className="relative w-full max-w-[500px] space-y-4">
+          {/* Glass stats row */}
+          <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Pedidos hoje", value: "847", delta: "+8.2%" },
-              { label: "Robux", value: "48k", delta: "+12.4%" },
-              { label: "Entrega média", value: "4 min", delta: "instantâneo" },
+              { label: "Pedidos hoje", value: "847", delta: "+8.2%", bar: 78 },
+              { label: "Robux entregues", value: "48k", delta: "+12.4%", bar: 92 },
+              { label: "Tempo médio", value: "4 min", delta: "Instantâneo", bar: 98 },
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="group rounded-xl border border-white/[0.06] bg-[#0c0c0c] p-3.5 transition-colors hover:border-[var(--accent)]/20"
+                className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 backdrop-blur-xl transition-all duration-500 hover:border-[var(--accent)]/30 hover:bg-white/[0.05] hover:shadow-[0_8px_32px_rgba(168,85,247,0.12)]"
               >
-                <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-[var(--fg-muted)]">
+                {/* Corner accent */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute right-0 top-0 h-8 w-8 bg-gradient-to-bl from-[var(--accent)]/10 to-transparent"
+                />
+
+                <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[var(--fg-muted)]">
                   {stat.label}
                 </p>
-                <p className="mt-2.5 font-display text-xl font-bold text-white">
+                <p className="mt-2 font-display text-2xl font-bold tabular-nums text-white">
                   {stat.value}
                 </p>
-                <p className="mt-1.5 text-[10px] font-medium text-[var(--accent-bright)]">
+                <p className="mt-1 text-[10px] font-medium text-emerald-400">
                   ↑ {stat.delta}
                 </p>
+
+                {/* Mini progress bar */}
+                <div className="mt-3 h-[2px] w-full overflow-hidden rounded-full bg-white/[0.06]">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-bright)]"
+                    style={{ width: `${stat.bar}%` }}
+                  />
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Activity chart card */}
-          <div className="mt-3 rounded-xl border border-white/[0.06] bg-[#0c0c0c] p-5">
-            <div className="mb-4 flex items-center justify-between">
+          {/* Glass chart card */}
+          <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 backdrop-blur-xl">
+            {/* Top glow line */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/50 to-transparent"
+            />
+
+            <div className="mb-5 flex items-start justify-between">
               <div>
-                <p className="text-[13px] font-semibold text-white">
-                  Atividade Hollow
+                <p className="font-display text-base font-bold text-white">
+                  Atividade em tempo real
                 </p>
-                <p className="mt-0.5 text-[10px] text-[var(--fg-muted)]">
-                  Entregas realizadas nas últimas 24h
+                <p className="mt-1 text-[11px] text-[var(--fg-muted)]">
+                  Entregas nas últimas 24 horas
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/10 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.12em] text-[var(--accent-bright)]">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent-bright)] opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--accent-bright)]" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 backdrop-blur-sm">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                 </span>
-                Online
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+                  Live
+                </span>
               </span>
             </div>
 
-            <svg
-              viewBox="0 0 400 130"
-              className="h-36 w-full"
-              preserveAspectRatio="none"
-              aria-hidden
-            >
-              <defs>
-                <linearGradient id="hollowChartFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path
-                d={`${CHART_POINTS} L400,130 L0,130 Z`}
-                fill="url(#hollowChartFill)"
-              />
-              <path
-                d={CHART_POINTS}
-                fill="none"
-                stroke="var(--accent-bright)"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </svg>
+            {/* Chart area with glass effect */}
+            <div className="relative">
+              <svg
+                viewBox="0 0 400 140"
+                className="h-40 w-full"
+                preserveAspectRatio="none"
+                aria-hidden
+              >
+                <defs>
+                  <linearGradient id="glassChartFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+                  </linearGradient>
+                  <filter id="chartGlow">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <path
+                  d={`${CHART_POINTS} L400,140 L0,140 Z`}
+                  fill="url(#glassChartFill)"
+                />
+                <path
+                  d={CHART_POINTS}
+                  fill="none"
+                  stroke="var(--accent-bright)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  filter="url(#chartGlow)"
+                />
+              </svg>
 
-            <div className="mt-2 flex justify-between text-[9px] uppercase tracking-[0.1em] text-[var(--fg-muted)]">
+              {/* Floating data point indicator */}
+              <div className="absolute right-[10%] top-[15%] flex items-center gap-2 rounded-lg border border-white/[0.08] bg-black/60 px-2.5 py-1.5 backdrop-blur-md">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-bright)] shadow-[0_0_6px_var(--accent-glow)]" />
+                <span className="text-[10px] font-semibold tabular-nums text-white">
+                  +127 agora
+                </span>
+              </div>
+            </div>
+
+            {/* Time axis */}
+            <div className="mt-3 flex justify-between border-t border-white/[0.04] pt-3 text-[9px] uppercase tracking-[0.12em] text-[var(--fg-muted)]">
               <span>00h</span>
               <span>06h</span>
               <span>12h</span>
               <span>18h</span>
-              <span>22h</span>
+              <span>Agora</span>
             </div>
           </div>
 
-          {/* Trust line */}
-          <p className="mt-5 text-center text-[11px] leading-relaxed text-[var(--fg-muted)]">
-            Mais de <span className="font-semibold text-white">12.000 entregas</span> realizadas com sucesso.
-            <br />
-            Suporte em português · Sem senha do Roblox
-          </p>
+          {/* Glass trust badge */}
+          <div className="flex items-center justify-center gap-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-4 backdrop-blur-lg">
+            <div className="text-center">
+              <p className="font-display text-lg font-bold text-white">12k+</p>
+              <p className="text-[9px] uppercase tracking-wider text-[var(--fg-muted)]">
+                Entregas
+              </p>
+            </div>
+            <div className="h-8 w-px bg-white/[0.08]" />
+            <div className="text-center">
+              <p className="font-display text-lg font-bold text-white">PT-BR</p>
+              <p className="text-[9px] uppercase tracking-wider text-[var(--fg-muted)]">
+                Suporte
+              </p>
+            </div>
+            <div className="h-8 w-px bg-white/[0.08]" />
+            <div className="text-center">
+              <p className="font-display text-lg font-bold text-white">0</p>
+              <p className="text-[9px] uppercase tracking-wider text-[var(--fg-muted)]">
+                Senhas
+              </p>
+            </div>
+          </div>
         </div>
       </aside>
     </div>
