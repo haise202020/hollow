@@ -6,8 +6,9 @@ const HERO_IMAGE = "/hero-avatar.webp";
 
 export function Hero() {
   return (
-    <section className="site-container relative z-0 grid items-center gap-10 pt-8 pb-12 md:grid-cols-[2fr_3fr] md:gap-4 md:pt-12 md:pb-20 lg:gap-0 lg:pt-16 lg:pb-24">
-      <div className="relative z-20">
+    <section className="site-container relative z-0 pt-8 pb-12 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24">
+      {/* Camada de texto — ocupa a largura natural do container */}
+      <div className="relative z-20 max-w-xl">
         <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
           Robux e Gamepasses{" "}
           <span className="text-[var(--accent)]">sem complicação.</span>
@@ -40,14 +41,19 @@ export function Hero() {
         </p>
       </div>
 
-      <div className="relative z-30 mx-auto min-w-0 w-full md:-mr-[320px] lg:-mr-[420px]">
-        <div className="relative aspect-[2000/1516] overflow-visible">
+      {/* Camada independente da imagem — flutua à direita sem comprimir o texto */}
+      <div
+        aria-hidden={false}
+        className="pointer-events-none absolute right-0 top-1/2 z-10 hidden w-[55vw] max-w-[1100px] -translate-y-1/2 md:block"
+        style={{ right: "min(0px, calc((100vw - 1180px) / -2))" }}
+      >
+        <div className="pointer-events-auto relative aspect-[2000/1516] w-full overflow-visible">
           <Image
             src={HERO_IMAGE}
             alt="Avatar Hollow com Robux"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 1100px"
+            sizes="(min-width: 1280px) 1100px, 55vw"
             quality={100}
             unoptimized
             className="object-contain object-center"
@@ -56,6 +62,26 @@ export function Hero() {
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/40 to-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Mobile: imagem dentro do fluxo, abaixo do texto */}
+      <div className="relative z-10 mt-10 md:hidden">
+        <div className="relative mx-auto aspect-[2000/1516] w-full max-w-[520px] overflow-visible">
+          <Image
+            src={HERO_IMAGE}
+            alt="Avatar Hollow com Robux"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 520px"
+            quality={100}
+            unoptimized
+            className="object-contain object-center"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/40 to-transparent"
           />
         </div>
       </div>
