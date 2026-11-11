@@ -51,7 +51,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto min-w-0 w-full max-w-[768px]">
-        <div className="relative aspect-[1359/1158] overflow-hidden">
+        <div className="relative aspect-square overflow-visible">
           <Image
             src={HERO_IMAGE}
             alt="Avatar Hollow com Robux"
