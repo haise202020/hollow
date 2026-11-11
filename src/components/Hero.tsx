@@ -40,14 +40,16 @@ export function Hero() {
         </p>
       </div>
 
-      <div className="relative z-30 mx-auto min-w-0 w-full max-w-[640px] origin-center md:-mr-[57px]" style={{ transform: "scale(1.35)" }}>
-        <div className="relative aspect-square overflow-visible">
+      <div className="relative z-30 mx-auto min-w-0 w-full max-w-[960px] md:-mr-[160px]">
+        <div className="relative aspect-[2000/1516] overflow-visible">
           <Image
             src={HERO_IMAGE}
             alt="Avatar Hollow com Robux"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 864px"
+            sizes="(max-width: 768px) 100vw, 960px"
+            quality={100}
+            unoptimized
             className="object-contain object-center"
           />
           {/* Fade sutil de baixo para cima */}
