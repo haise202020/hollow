@@ -75,7 +75,13 @@ export function LoginClient() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[var(--bg)] text-white lg:grid lg:grid-cols-2">
+    <div
+      className="relative min-h-screen text-white lg:grid lg:grid-cols-2"
+      style={{
+        background:
+          "linear-gradient(to right, #05030e 0%, #05030e 35%, #0a0618 55%, #0f0a24 75%, #130d2e 100%)",
+      }}
+    >
       {/* Ambient glow — soft purple depth behind form */}
       <div
         aria-hidden
@@ -245,10 +251,10 @@ export function LoginClient() {
 
       {/* Right panel — glassmorphism dashboard */}
       <aside className="relative hidden overflow-hidden lg:flex lg:items-center lg:justify-center lg:px-10 lg:py-12">
-        {/* Background layers */}
+        {/* Background layers — transparent to let parent gradient show through */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[#05030e]"
+          className="pointer-events-none absolute inset-0"
         />
         <div
           aria-hidden
