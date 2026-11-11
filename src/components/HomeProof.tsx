@@ -1,520 +1,256 @@
-import { DiscordIcon } from "./icons";
+"use client";
 
-function HudStat({
-  value,
-  label,
-  barValue,
-  accent = false,
+import Image from "next/image";
+import { useEffect, useRef, useState, useCallback } from "react";
+
+/* ─── Notification data ─── */
+const NOTIFICATIONS = [
+  { title: "Entrega concluída", body: "Seus 1.000 Robux foram entregues com sucesso." },
+  { title: "Robux entregues", body: "2.500 Robux adicionados à sua conta." },
+  { title: "Pedido finalizado", body: "Seus 500 Robux chegaram. Aproveite!" },
+  { title: "Entrega realizada", body: "5.000 Robux entregues com sucesso." },
+  { title: "Robux creditados", body: "1.700 Robux já estão na sua conta." },
+  { title: "Entrega confirmada", body: "3.200 Robux entregues em menos de 2 min." },
+];
+
+/* ─── Phone notification component ─── */
+function PhoneNotification({
+  notification,
+  visible,
 }: {
-  value: string;
-  label: string;
-  barValue: number;
-  accent?: boolean;
+  notification: (typeof NOTIFICATIONS)[number];
+  visible: boolean;
 }) {
   return (
-    <div className="group relative">
-      {/* HUD frame */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-5 backdrop-blur-sm transition-all duration-500 hover:border-[var(--accent)]/40 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)]">
-        {/* Corner accents */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-2 top-2 h-3 w-3 border-l-2 border-t-2 border-[var(--accent)]/50"
+    <div
+      className={`pointer-events-none absolute top-4 left-3 right-3 z-30 flex items-start gap-3 rounded-2xl border border-white/[0.08] bg-[#1a1a2e]/95 px-4 py-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        visible
+          ? "translate-y-0 opacity-100"
+          : "-translate-y-4 opacity-0"
+      }`}
+    >
+      {/* Hollow logo mini */}
+      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15">
+        <Image
+          src="/logo.png"
+          alt=""
+          width={20}
+          height={20}
+          className="h-5 w-auto opacity-90"
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-2 top-2 h-3 w-3 border-r-2 border-t-2 border-[var(--accent)]/50"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-2 left-2 h-3 w-3 border-b-2 border-l-2 border-[var(--accent)]/50"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b-2 border-r-2 border-[var(--accent)]/50"
-        />
-
-        {/* Value */}
-        <div className="flex items-baseline gap-1.5">
-          <span
-            className={`font-display text-3xl font-bold tabular-nums ${
-              accent ? "text-[var(--accent-bright)]" : "text-white"
-            }`}
-          >
-            {value}
-          </span>
-        </div>
-
-        {/* Label */}
-        <p className="mt-1.5 text-[11px] uppercase tracking-[0.15em] text-[var(--fg-muted)]">
-          {label}
-        </p>
-
-        {/* Progress bar */}
-        <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-white/[0.06]">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-bright)] shadow-[0_0_8px_var(--accent-glow)] transition-all duration-1000"
-            style={{ width: `${barValue}%` }}
-          />
-        </div>
       </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--fg-muted)]">
+          Hollow
+        </p>
+        <p className="mt-0.5 text-[13px] font-semibold leading-tight text-white">
+          {notification.title}
+        </p>
+        <p className="mt-1 text-[11px] leading-relaxed text-[var(--fg-muted)]">
+          {notification.body}
+        </p>
+      </div>
+
+      <span className="mt-0.5 text-[9px] text-[var(--fg-muted)]">agora</span>
     </div>
   );
 }
 
-function AchievementCard({
-  icon,
-  title,
-  description,
-  tag,
-  glowColor = "purple",
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  tag: string;
-  glowColor?: "purple" | "emerald" | "amber" | "cyan";
-}) {
-  const glowMap = {
-    purple: "rgba(168, 85, 247, 0.25)",
-    emerald: "rgba(16, 185, 129, 0.25)",
-    amber: "rgba(245, 158, 11, 0.25)",
-    cyan: "rgba(6, 182, 212, 0.25)",
-  };
+/* ─── Interactive 3D Phone ─── */
+function PhoneMockup() {
+  const phoneRef = useRef<HTMLDivElement>(null);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const [notifIndex, setNotifIndex] = useState(0);
+  const [notifVisible, setNotifVisible] = useState(false);
 
-  const accentMap = {
-    purple: "text-[var(--accent-bright)]",
-    emerald: "text-emerald-400",
-    amber: "text-amber-400",
-    cyan: "text-cyan-400",
-  };
+  // Mouse parallax
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!phoneRef.current) return;
+    const rect = phoneRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const deltaX = (e.clientX - centerX) / (rect.width / 2);
+    const deltaY = (e.clientY - centerY) / (rect.height / 2);
+    setRotation({
+      x: Math.max(-8, Math.min(8, -deltaY * 8)),
+      y: Math.max(-8, Math.min(8, deltaX * 8)),
+    });
+  }, []);
 
-  const tagBgMap = {
-    purple: "bg-[var(--accent)]/10 text-[var(--accent-bright)] border-[var(--accent)]/20",
-    emerald: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
-    amber: "bg-amber-400/10 text-amber-400 border-amber-400/20",
-    cyan: "bg-cyan-400/10 text-cyan-400 border-cyan-400/20",
-  };
+  const handleMouseEnter = useCallback(() => setIsHovering(true), []);
+  const handleMouseLeave = useCallback(() => {
+    setIsHovering(false);
+    setRotation({ x: 0, y: 0 });
+  }, []);
+
+  // Notification cycle
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
+    function cycle() {
+      setNotifVisible(true);
+      timeout = setTimeout(() => {
+        setNotifVisible(false);
+        timeout = setTimeout(() => {
+          setNotifIndex((prev) => (prev + 1) % NOTIFICATIONS.length);
+          cycle();
+        }, 800);
+      }, 4000);
+    }
+
+    // Start after initial delay
+    timeout = setTimeout(cycle, 2000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
-    <div className="group relative">
-      {/* Ambient glow on hover */}
+    <div
+      className="relative mx-auto w-[280px] sm:w-[300px] lg:w-[320px]"
+      style={{ perspective: "1200px" }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 rounded-3xl opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-100"
-        style={{ background: glowMap[glowColor] }}
-      />
+        ref={phoneRef}
+        className="relative transition-transform duration-200 ease-out"
+        style={{
+          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+          transformStyle: "preserve-3d",
+        }}
+      >
+        {/* Phone body */}
+        <div className="relative overflow-hidden rounded-[3rem] border-[3px] border-[#2a2a3a] bg-[#0a0a0f] shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.05)_inset]">
+          {/* Screen bezel highlight */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-[2.8rem] border border-white/[0.04]"
+          />
 
-      <div className="relative h-full overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-6 backdrop-blur-sm transition-all duration-500 group-hover:border-white/[0.15]">
-        {/* Top scanline effect */}
+          {/* Dynamic island / notch */}
+          <div className="absolute top-3 left-1/2 z-40 h-6 w-24 -translate-x-1/2 rounded-full bg-black" />
+
+          {/* Screen content area */}
+          <div className="relative aspect-[9/19.5] w-full overflow-hidden bg-gradient-to-b from-[#0f0f18] to-[#0a0a10]">
+            {/* Status bar */}
+            <div className="flex items-center justify-between px-6 pt-12 pb-2">
+              <span className="text-[10px] font-medium text-white/60">9:41</span>
+              <div className="flex items-center gap-1.5">
+                <svg className="h-3 w-3 text-white/50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93z" />
+                </svg>
+                <svg className="h-3 w-3 text-white/50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Wallpaper ambient glow */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute top-1/3 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/10 blur-[60px]"
+            />
+
+            {/* App grid placeholder — subtle dots */}
+            <div className="mt-8 grid grid-cols-4 gap-x-4 gap-y-6 px-6">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5">
+                  <div className="h-12 w-12 rounded-xl bg-white/[0.04] border border-white/[0.03]" />
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom dock */}
+            <div className="absolute bottom-0 left-0 right-0 border-t border-white/[0.04] bg-white/[0.02] px-6 py-4 backdrop-blur-md">
+              <div className="flex justify-between">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-12 w-12 rounded-xl bg-white/[0.05] border border-white/[0.04]" />
+                ))}
+              </div>
+            </div>
+
+            {/* Home indicator */}
+            <div className="absolute bottom-1.5 left-1/2 h-1 w-28 -translate-x-1/2 rounded-full bg-white/20" />
+
+            {/* Notification overlay */}
+            <PhoneNotification
+              notification={NOTIFICATIONS[notifIndex]}
+              visible={notifVisible}
+            />
+          </div>
+        </div>
+
+        {/* Phone side reflection */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/40 to-transparent"
+          className="pointer-events-none absolute -right-1 top-[10%] bottom-[10%] w-[2px] rounded-full bg-gradient-to-b from-transparent via-white/[0.08] to-transparent"
         />
-
-        {/* Tag */}
-        <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${tagBgMap[glowColor]}`}>
-          <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-current" />
-          {tag}
-        </div>
-
-        {/* Icon badge */}
-        <div
-          className={`mt-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/[0.06] bg-black/40 ${accentMap[glowColor]} transition-transform duration-500 group-hover:scale-110`}
-        >
-          {icon}
-        </div>
-
-        {/* Title */}
-        <h3 className="mt-5 font-display text-xl font-bold text-white">
-          {title}
-        </h3>
-
-        {/* Description */}
-        <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-          {description}
-        </p>
       </div>
     </div>
   );
 }
 
-function PipelineStep({
-  step,
-  title,
-  subtitle,
-  icon,
-}: {
-  step: string;
-  title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div className="relative flex flex-1 flex-col items-center text-center">
-      {/* Icon circle */}
-      <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-gradient-to-br from-[var(--accent)]/15 to-transparent text-[var(--accent-bright)] shadow-[0_0_24px_rgba(168,85,247,0.2)] md:h-20 md:w-20">
-        <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full border border-[var(--accent)]/40 bg-[var(--bg-elevated)] text-[10px] font-bold text-[var(--accent-bright)]">
-          {step}
-        </span>
-        {icon}
-      </div>
-
-      {/* Text */}
-      <h4 className="mt-4 font-display text-base font-bold text-white md:text-lg">
-        {title}
-      </h4>
-      <p className="mt-1 text-xs text-[var(--fg-muted)] md:text-sm">
-        {subtitle}
-      </p>
-    </div>
-  );
-}
-
+/* ─── Main section ─── */
 export function HomeProof() {
   return (
     <section className="relative overflow-hidden bg-[var(--bg)]">
-      {/* Subtle background grid */}
+      {/* Subtle ambient */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.025]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
+        className="pointer-events-none absolute right-[-5%] top-[20%] h-[500px] w-[500px] rounded-full bg-[rgba(168,85,247,0.06)] blur-[140px]"
       />
 
-      {/* Ambient orbs */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-[-10%] top-[15%] h-[420px] w-[420px] rounded-full bg-[rgba(168,85,247,0.08)] blur-[120px]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-[-5%] bottom-[10%] h-[380px] w-[380px] rounded-full bg-[rgba(52,211,153,0.06)] blur-[120px]"
-      />
-
-      <div className="site-container relative py-20 md:py-28">
-        {/* Section header */}
-        <div className="mx-auto mb-16 max-w-2xl text-center md:mb-20">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/5 px-3 py-1">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent)] opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--accent)]" />
+      <div className="site-container relative py-20 md:py-28 lg:py-32">
+        <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
+          {/* ── Left: Text content ── */}
+          <div className="max-w-xl">
+            {/* Label */}
+            <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--accent-bright)]">
+              Entrega automática
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-bright)]">
-              Missão Hollow
-            </span>
-          </div>
 
-          <h2 className="font-display text-4xl font-bold leading-[1.1] tracking-tight text-white md:text-5xl">
-            Cada compra é uma{" "}
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-bright)] bg-clip-text text-transparent">
-                conquista desbloqueada
-              </span>
-              <span
-                aria-hidden
-                className="absolute -bottom-1 left-0 h-[2px] w-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-bright)]"
-              />
-            </span>
-          </h2>
+            {/* Title */}
+            <h2 className="mt-4 font-display text-4xl font-bold leading-[1.08] tracking-tight text-white md:text-5xl lg:text-[3.5rem]">
+              Do pedido à entrega,{" "}
+              <span className="text-[var(--accent)]">sem você intervir.</span>
+            </h2>
 
-          <p className="mx-auto mt-5 max-w-xl text-base text-[var(--fg-muted)] md:text-lg">
-            Quatro promessas reais. Zero promessas vazias. É assim que entregamos cada pedido.
-          </p>
-        </div>
+            {/* Description */}
+            <p className="mt-5 text-lg leading-relaxed text-[var(--fg-muted)]">
+              A Hollow automatiza cada etapa. Você escolhe, paga e recebe seus
+              Robux com acompanhamento em tempo real — sem precisar ficar
+              esperando na tela.
+            </p>
 
-        {/* HUD stats row */}
-        <div className="mb-16 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          <HudStat value="100%" label="Entregas monitoradas" barValue={100} />
-          <HudStat
-            value="30%"
-            label="Taxa transparente"
-            barValue={100}
-            accent
-          />
-          <HudStat value="24/7" label="Suporte ativo" barValue={95} />
-          <HudStat value="0" label="Senhas solicitadas" barValue={0} />
-        </div>
-
-        {/* Achievement cards grid */}
-        <div className="grid gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
-          <AchievementCard
-            tag="Promessa #01"
-            glowColor="purple"
-            icon={
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-            }
-            title="Compra transparente"
-            description="Preço claro desde o início. A taxa de 30% já está inclusa no cálculo, sem surpresas na hora de pagar."
-          />
-
-          <AchievementCard
-            tag="Promessa #02"
-            glowColor="cyan"
-            icon={
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-            }
-            title="Sem acesso à conta"
-            description="Você só informa o username do Roblox. Nada de senha ou dados sensíveis. Sua conta continua sua."
-          />
-
-          <AchievementCard
-            tag="Promessa #03"
-            glowColor="emerald"
-            icon={
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-            }
-            title="Entrega em minutos"
-            description="Pedidos processados com agilidade. Você confirma o pagamento e acompanha a entrega em tempo real."
-          />
-
-          <AchievementCard
-            tag="Promessa #04"
-            glowColor="amber"
-            icon={
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            }
-            title="Melhor preço, zero surpresa"
-            description="1.000 Robux por R$ 38,00 com taxa já inclusa. Transparência total no valor final — sem cobranças ocultas."
-          />
-        </div>
-
-        {/* Pipeline: como funciona */}
-        <div className="mt-20 md:mt-28">
-          <div className="mb-12 text-center">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--accent-bright)]">
-              Fluxo Hollow
-            </span>
-            <h3 className="mt-3 font-display text-3xl font-bold text-white md:text-4xl">
-              Três passos. Sem enrolação.
-            </h3>
-          </div>
-
-          <div className="relative">
-            {/* Connecting line (desktop) */}
-            <div
-              aria-hidden
-              className="absolute left-[10%] right-[10%] top-8 hidden h-px bg-gradient-to-r from-transparent via-[var(--accent)]/40 to-transparent md:top-10 md:block"
-            />
-            <div
-              aria-hidden
-              className="absolute left-[10%] right-[10%] top-8 hidden h-px bg-gradient-to-r from-transparent via-[var(--accent)]/20 blur-sm to-transparent md:top-10 md:block"
-            />
-
-            <div className="relative grid gap-10 md:grid-cols-3 md:gap-8">
-              <PipelineStep
-                step="01"
-                title="Escolhe"
-                subtitle="Selecione Robux ou um gamepass e informe seu username do Roblox"
-                icon={
-                  <svg
-                    className="h-7 w-7 md:h-8 md:w-8"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                }
-              />
-
-              <PipelineStep
-                step="02"
-                title="Paga"
-                subtitle="Finalize via PIX com valor total já claro, taxa inclusa"
-                icon={
-                  <svg
-                    className="h-7 w-7 md:h-8 md:w-8"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                    />
-                  </svg>
-                }
-              />
-
-              <PipelineStep
-                step="03"
-                title="Recebe"
-                subtitle="Acompanhe a entrega no chat e receba seus Robux com segurança"
-                icon={
-                  <svg
-                    className="h-7 w-7 md:h-8 md:w-8"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                }
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Discord CTA */}
-        <div className="mt-20 md:mt-28">
-          <div className="relative overflow-hidden rounded-3xl border border-[#5865F2]/20 bg-gradient-to-br from-[#5865F2]/10 via-[var(--bg-elevated)] to-[var(--bg-panel)]">
-            {/* Decorative glow */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[#5865F2]/15 blur-[100px]"
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-[var(--accent)]/10 blur-[80px]"
-            />
-
-            <div className="relative z-10 grid items-center gap-8 p-8 md:grid-cols-[1.2fr_auto] md:p-12">
-              <div>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            {/* Steps */}
+            <div className="mt-10 space-y-5">
+              {[
+                { step: "01", label: "Escolha o produto" },
+                { step: "02", label: "Faça o pagamento via PIX" },
+                { step: "03", label: "Receba seus Robux automaticamente" },
+              ].map((item) => (
+                <div key={item.step} className="flex items-center gap-5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] font-mono text-xs font-bold text-[var(--accent-bright)]">
+                    {item.step}
                   </span>
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
-                    Suporte online agora
+                  <span className="text-base font-medium text-white">
+                    {item.label}
                   </span>
                 </div>
-
-                <h3 className="font-display text-2xl font-bold text-white md:text-3xl">
-                  Precisa de ajuda?{" "}
-                  <span className="text-[var(--accent)]">Suporte real.</span>
-                </h3>
-                <p className="mt-2 max-w-lg text-base text-[var(--fg-muted)]">
-                  Atendimento pelo Discord com equipe em português. Dúvidas
-                  sobre Robux, gamepasses ou status do pedido resolvidas por
-                  pessoas reais.
-                </p>
-
-                <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-                  <span className="flex items-center gap-2 text-[var(--fg-muted)]">
-                    <svg
-                      className="h-4 w-4 text-[var(--accent)]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Equipe em português
-                  </span>
-                  <span className="flex items-center gap-2 text-[var(--fg-muted)]">
-                    <svg
-                      className="h-4 w-4 text-[var(--accent)]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Resposta ágil
-                  </span>
-                  <span className="flex items-center gap-2 text-[var(--fg-muted)]">
-                    <svg
-                      className="h-4 w-4 text-[var(--accent)]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Acompanhamento do pedido
-                  </span>
-                </div>
-              </div>
-
-              <a
-                href="https://discord.gg/hollowbux"
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center justify-center gap-3 rounded-2xl bg-[#5865F2] px-8 py-4 text-sm font-semibold text-white shadow-[0_0_30px_rgba(88,101,242,0.3)] transition-all hover:bg-[#6d78f5] hover:shadow-[0_0_40px_rgba(88,101,242,0.4)]"
-              >
-                <DiscordIcon className="h-5 w-5 transition-transform group-hover:scale-110" />
-                Entrar no Discord
-              </a>
+              ))}
             </div>
+
+            {/* Complementary line */}
+            <p className="mt-8 text-sm text-[var(--fg-muted)]">
+              Seu pedido continua em andamento mesmo sem você acompanhar a tela.
+            </p>
+          </div>
+
+          {/* ── Right: 3D Phone ── */}
+          <div className="flex items-center justify-center lg:justify-end">
+            <PhoneMockup />
           </div>
         </div>
       </div>
