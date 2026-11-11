@@ -6,7 +6,7 @@ const HERO_IMAGE = "/hero-avatar.webp";
 
 export function Hero() {
   return (
-    <section className="site-container relative z-0 pt-8 pb-12 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24">
+    <section className="site-container relative z-0 mt-[38px] pt-8 pb-12 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24">
       {/* Camada de texto — ocupa a largura natural do container */}
       <div className="relative z-20 max-w-xl">
         <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
