@@ -13,25 +13,24 @@ const NOTIFICATIONS = [
   { id: 6, title: "Entrega confirmada", body: "3.200 Robux entregues em menos de 2 min." },
 ];
 
-type NotifItem = (typeof NOTIFICATIONS)[number] & { key: number };
+type NotifItem = (typeof NOTIFICATIONS)[number] & { key: number; entering: boolean };
 
 /* ─── Single notification card in the stack ─── */
 function NotifCard({
   notification,
   index,
-  total,
 }: {
   notification: NotifItem;
   index: number;
-  total: number;
 }) {
-  // Opacity and scale decrease for lower items
   const opacity = index === 0 ? 1 : index === 1 ? 0.85 : 0.7;
   const scale = index === 0 ? 1 : index === 1 ? 0.97 : 0.94;
 
   return (
     <div
-      className="absolute left-3 right-3 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+      className={`absolute left-3 right-3 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        notification.entering ? "animate-notif-enter" : ""
+      }`}
       style={{
         bottom: `${80 + index * 72}px`,
         opacity,
@@ -124,25 +123,34 @@ function PhoneMockup() {
     });
   }, []);
 
-  const handleMouseEnter = useCallback(() => {}, []);
   const handleMouseLeave = useCallback(() => {
     setRotation({ x: 0, y: 0 });
   }, []);
 
-  // Notification stack cycle: new enters at top, old ones shift down, max 3
+  // Notification stack cycle: new enters at top from above, old ones shift down, max 3
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
 
     function addNotification() {
       const notif = NOTIFICATIONS[notifCycleIndex.current % NOTIFICATIONS.length];
       notifCycleIndex.current++;
-      const newItem: NotifItem = { ...notif, key: nextKey.current++ };
+      const newItem: NotifItem = { ...notif, key: nextKey.current++, entering: true };
 
       setStack((prev) => {
-        const updated = [newItem, ...prev];
-        // Keep max 3 visible
+        // Mark existing items as no longer entering
+        const settled = prev.map((item) => ({ ...item, entering: false }));
+        const updated = [newItem, ...settled];
         return updated.slice(0, 3);
       });
+
+      // Remove entering flag after animation completes
+      setTimeout(() => {
+        setStack((prev) =>
+          prev.map((item) =>
+            item.key === newItem.key ? { ...item, entering: false } : item
+          )
+        );
+      }, 700);
 
       // Schedule next notification (4-8s random interval)
       const delay = 4000 + Math.random() * 4000;
@@ -159,7 +167,6 @@ function PhoneMockup() {
       className="relative mx-auto w-[280px] sm:w-[300px] lg:w-[320px]"
       style={{ perspective: "1200px" }}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div
@@ -225,7 +232,6 @@ function PhoneMockup() {
                 key={notif.key}
                 notification={notif}
                 index={i}
-                total={stack.length}
               />
             ))}
           </div>
@@ -251,14 +257,36 @@ function PhoneMockup() {
 export function HomeProof() {
   return (
     <section className="relative overflow-hidden bg-[var(--bg)]">
+      {/* Keyframes for notification enter animation (top-to-bottom) */}
+      <style>{`
+        @keyframes notif-enter {
+          0% {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .animate-notif-enter {
+          animation: notif-enter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
+
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-5%] top-[20%] h-[500px] w-[500px] rounded-full bg-[rgba(168,85,247,0.06)] blur-[140px]"
+        className="pointer-events-none absolute left-[-5%] top-[20%] h-[500px] w-[500px] rounded-full bg-[rgba(168,85,247,0.06)] blur-[140px]"
       />
 
       <div className="site-container relative py-20 md:py-28 lg:py-32">
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
-          {/* Left: Text content */}
+          {/* Left: 3D Phone with Lock Screen */}
+          <div className="flex items-center justify-center lg:justify-start">
+            <PhoneMockup />
+          </div>
+
+          {/* Right: Text content */}
           <div className="max-w-xl">
             <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--accent-bright)]">
               Entrega automática
@@ -295,11 +323,6 @@ export function HomeProof() {
             <p className="mt-8 text-sm text-[var(--fg-muted)]">
               Seu pedido continua em andamento mesmo sem você acompanhar a tela.
             </p>
-          </div>
-
-          {/* Right: 3D Phone with Lock Screen */}
-          <div className="flex items-center justify-center lg:justify-end">
-            <PhoneMockup />
           </div>
         </div>
       </div>
