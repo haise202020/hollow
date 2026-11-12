@@ -14,7 +14,7 @@ export function Hero() {
       />
 
       {/* Grid compartilhado — texto e imagem no mesmo container responsivo */}
-      <div className="grid items-center md:grid-cols-[1fr_1.28fr] md:gap-4 lg:gap-8">
+      <div className="grid items-center md:grid-cols-[1fr_1.6fr] md:gap-2 lg:gap-6">
         {/* Coluna de texto */}
         <div className="relative z-20 w-full max-w-[540px]">
           <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
