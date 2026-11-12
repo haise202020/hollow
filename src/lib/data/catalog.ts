@@ -21,9 +21,9 @@ export function catalogByCategory(category: CatalogCategory): Gamepass[] {
   return hotItems.filter((item) => itemCategory(item) === category);
 }
 
-/** Base: 1000 Robux = R$ 38 */
+/** Base: 1000 Robux = R$ 43 */
 export const ROBUX_PER_BRL_UNIT = 1000;
-export const ROBUX_PRICE_PER_UNIT = 38;
+export const ROBUX_PRICE_PER_UNIT = 43;
 export const ROBUX_MIN = 100;
 export const ROBUX_MAX = 50_000;
 export const ROBUX_STEP = 100;
