@@ -538,7 +538,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
                       placeholder="Digite sua mensagem…"
                       maxLength={2000}
                       rows={1}
-                      className="w-full resize-none overflow-x-hidden rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]"
+                      className="w-full resize-none overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)] scrollbar-hide"
                     />
                   </div>
                   <button
