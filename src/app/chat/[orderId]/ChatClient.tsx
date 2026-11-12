@@ -1,8 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import type { ChatMessage } from "@/lib/chat/types";
 
 type OrderSummary = {
@@ -267,51 +265,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#08090d] text-white">
-      {/* Header principal do site */}
-      <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#07070a]/95 backdrop-blur-xl">
-        <div className="site-container flex h-[72px] items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 transition opacity-90 hover:opacity-100"
-          >
-            <Image
-              src="/logo.png"
-              alt="Hollow"
-              width={36}
-              height={36}
-              priority
-              className="h-9 w-auto"
-            />
-            <span className="font-display text-xl font-bold tracking-tight text-white">
-              hollow
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-[var(--fg-muted)] sm:inline">
-              Pedido #{orderId.slice(4, 12)}
-            </span>
-            <Link
-              href="/"
-              className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white transition hover:border-[var(--accent)]/50 hover:bg-white/[0.06]"
-            >
-              ← Voltar
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Fundo com gradientes roxos sutis */}
-      <div className="relative flex-1">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-[-10%] top-[-5%] h-[600px] w-[600px] rounded-full bg-[rgba(139,92,246,0.06)] blur-[150px]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-[-10%] bottom-[10%] h-[500px] w-[500px] rounded-full bg-[rgba(139,92,246,0.04)] blur-[120px]"
-        />
-
+      <div className="relative flex-1 overflow-x-hidden">
         <main className="site-container relative py-8 md:py-12">
           <div className="grid gap-6 lg:grid-cols-[380px_1fr] lg:gap-8">
             {/* ═══════════════════════════════════════
@@ -319,7 +273,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
             ═══════════════════════════════════════ */}
             <aside className="space-y-4">
               {/* Card: Resumo do Pedido */}
-              <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0a14]/80 backdrop-blur-xl">
+              <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0a14]/90 backdrop-blur-md">
                 {/* Header do card */}
                 <div className="border-b border-white/[0.06] px-5 py-4">
                   <div className="flex items-center gap-3">
@@ -438,7 +392,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
               </div>
 
               {/* Card: Privacidade */}
-              <div className="rounded-2xl border border-white/[0.06] bg-[#0c0a14]/80 px-5 py-4 backdrop-blur-xl">
+              <div className="rounded-2xl border border-white/[0.06] bg-[#0c0a14]/90 px-5 py-4 backdrop-blur-md">
                 <div className="flex items-start gap-3">
                   <IconLock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--fg-muted)]" />
                   <p className="text-xs leading-relaxed text-[var(--fg-muted)]">
@@ -452,7 +406,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
             {/* ═══════════════════════════════════════
                 COLUNA DIREITA — Chat de suporte
             ═══════════════════════════════════════ */}
-            <section className="flex min-h-[calc(100vh-200px)] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0a14]/80 backdrop-blur-xl">
+            <section className="flex min-h-[calc(100vh-200px)] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0a14]/90 backdrop-blur-md">
               {/* Chat header */}
               <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
                 <div className="flex items-center gap-3">
@@ -584,7 +538,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
                       placeholder="Digite sua mensagem…"
                       maxLength={2000}
                       rows={1}
-                      className="w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]"
+                      className="w-full resize-none overflow-x-hidden rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]"
                     />
                   </div>
                   <button
