@@ -85,7 +85,7 @@ export function DashboardClient() {
           <div
             key={card.label}
             style={{ animationDelay: `${0.06 * index}s` }}
-            className="animate-rise rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 p-5 backdrop-blur-md transition hover:border-[var(--accent)]/30"
+            className="animate-rise rounded-2xl border-none bg-[#0c0a14]/80 p-5 backdrop-blur-md transition hover:border-[var(--accent)]/30"
           >
             <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--fg-muted)]">
               {card.label}
@@ -99,7 +99,7 @@ export function DashboardClient() {
       </div>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 p-5 backdrop-blur-md">
+        <div className="rounded-2xl border-none bg-[#0c0a14]/80 p-5 backdrop-blur-md">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <p className="font-display text-lg font-semibold text-white">
@@ -137,7 +137,7 @@ export function DashboardClient() {
           </svg>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 p-5 backdrop-blur-md">
+        <div className="rounded-2xl border-none bg-[#0c0a14]/80 p-5 backdrop-blur-md">
           <p className="font-display text-lg font-semibold text-white">Atalhos</p>
           <div className="mt-4 space-y-2">
             {[
@@ -172,7 +172,7 @@ export function DashboardClient() {
         </div>
 
         {recent.length === 0 ? (
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 px-6 py-10 text-center backdrop-blur-md">
+          <div className="rounded-2xl border-none bg-[#0c0a14]/80 px-6 py-10 text-center backdrop-blur-md">
             <p className="text-white">Nenhum pedido ainda</p>
             <Link
               href="/robux"
@@ -186,7 +186,7 @@ export function DashboardClient() {
             {recent.map((order) => (
               <article
                 key={order.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 px-5 py-4 backdrop-blur-md"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-none bg-[#0c0a14]/80 px-5 py-4 backdrop-blur-md"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">

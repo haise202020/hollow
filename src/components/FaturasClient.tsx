@@ -57,7 +57,7 @@ export function FaturasClient() {
         ].map((card) => (
           <div
             key={card.label}
-            className="rounded-2xl border border-white/[0.06] bg-[#0c0c10] p-5"
+            className="rounded-2xl border-none bg-[#0c0a14]/80 p-5 backdrop-blur-md"
           >
             <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--fg-muted)]">
               {card.label}
@@ -74,7 +74,7 @@ export function FaturasClient() {
           Histórico
         </h2>
         {invoices.length === 0 ? (
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0c0c10] px-6 py-10 text-center">
+          <div className="rounded-2xl border-none bg-[#0c0a14]/80 px-6 py-10 text-center backdrop-blur-md">
             <p className="text-white">Nenhuma fatura ainda</p>
             <Link
               href="/robux"
@@ -84,7 +84,7 @@ export function FaturasClient() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0c10]">
+          <div className="overflow-hidden rounded-2xl border-none bg-[#0c0a14]/80 backdrop-blur-md">
             <div className="hidden grid-cols-[1.4fr_1fr_0.8fr_0.7fr] gap-3 border-b border-white/[0.06] px-5 py-3 text-[11px] uppercase tracking-[0.12em] text-[var(--fg-muted)] sm:grid">
               <span>Produto</span>
               <span>Data</span>

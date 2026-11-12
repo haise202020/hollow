@@ -87,7 +87,7 @@ export function ProfileClient() {
       subtitle="Dados da conta e alteração de senha."
     >
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 p-6 backdrop-blur-md">
+        <div className="rounded-2xl border-none bg-[#0c0a14]/80 p-6 backdrop-blur-md">
           <div className="flex items-center gap-4">
             {user?.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -128,7 +128,7 @@ export function ProfileClient() {
           </dl>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 p-6 backdrop-blur-md">
+        <div className="rounded-2xl border-none bg-[#0c0a14]/80 p-6 backdrop-blur-md">
           <h2 className="font-display text-lg font-semibold text-white">
             Alterar senha
           </h2>

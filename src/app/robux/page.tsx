@@ -59,7 +59,7 @@ export default function RobuxPage() {
           ].map((item) => (
             <div
               key={item.title}
-              className="rounded-xl border border-white/[0.08] bg-[#0c0a14]/80 p-5 backdrop-blur-md transition-colors hover:border-[var(--accent)]/20"
+              className="rounded-xl border-none bg-[#0c0a14]/80 p-5 backdrop-blur-md transition-colors hover:border-[var(--accent)]/20"
             >
               <h3 className="font-display text-base font-semibold text-white">
                 {item.title}
