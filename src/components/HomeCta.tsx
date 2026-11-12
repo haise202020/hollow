@@ -4,7 +4,12 @@ import { BasketIcon } from "./icons";
 export function HomeCta() {
   return (
     <section className="site-container py-14 md:py-20">
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[var(--bg-panel)] px-6 py-12 text-center md:px-12 md:py-16">
+      <div className="relative overflow-hidden rounded-2xl border-none bg-white/[0.03] px-6 py-12 text-center backdrop-blur-xl md:px-12 md:py-16">
+        {/* Glass inner highlight */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.15] to-transparent"
+        />
         {/* Subtle accent glow */}
         <div
           aria-hidden

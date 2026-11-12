@@ -5,18 +5,24 @@ import { BasketIcon } from "./icons";
 import { ProductPriceRow } from "./ProductPriceRow";
 
 export function HotItems() {
-  const items = catalogByCategory("permanent").slice(0, 8);
+  const items = catalogByCategory("permanent").slice(0, 5);
   return (
     <section className="site-container relative overflow-visible py-14 md:py-16">
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <h2 className="font-display text-xl font-bold text-white md:text-2xl">
+      <div className="mb-10 text-center">
+        <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-bright)] md:text-sm">
+          Blox Fruits
+        </span>
+        <h2 className="font-display text-3xl font-bold text-white md:text-4xl lg:text-5xl">
           Itens em Alta
         </h2>
+        <p className="mx-auto mt-3 max-w-lg text-base text-[var(--fg-muted)] md:text-lg">
+          As frutas mais procuradas com os melhores preços do Brasil.
+        </p>
         <Link
           href="/gamepasses"
-          className="text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-bright)]"
+          className="mt-5 inline-block text-base font-semibold text-[var(--accent)] transition hover:text-[var(--accent-bright)] md:text-lg"
         >
-          Ver todos
+          Ver todos →
         </Link>
       </div>
 

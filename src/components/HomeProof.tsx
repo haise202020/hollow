@@ -15,8 +15,9 @@ const NOTIFICATIONS = [
 
 type NotifItem = (typeof NOTIFICATIONS)[number] & { key: number; entering: boolean };
 
-/* ─── Inclinação inicial 3D (perspectiva sutil, ângulo da referência) ─── */
-const BASE_ROTATION = { x: 1, y: -5, z: -3 };
+/* ─── Inclinação inicial 3D (referência: topo à esquerda, borda horizontal, frente para direita) ─── */
+const BASE_ROTATION = { x: 2, y: 12, z: -1 };
+const PERSPECTIVE = "1000px";
 
 /* ─── Single notification card in the stack ─── */
 function NotifCard({
@@ -168,7 +169,7 @@ function PhoneMockup() {
   return (
     <div
       className="relative mx-auto w-[280px] sm:w-[300px] lg:w-[320px]"
-      style={{ perspective: "1200px" }}
+      style={{ perspective: PERSPECTIVE }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >

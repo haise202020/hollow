@@ -1,3 +1,4 @@
+import { GamepassesSection } from "@/components/GamepassesSection";
 import { Hero } from "@/components/Hero";
 import { HomeCta } from "@/components/HomeCta";
 import { HomeProof } from "@/components/HomeProof";
@@ -10,6 +11,7 @@ export default function HomePage() {
       <Hero />
       <PopularCategories />
       <HomeProof />
+      <GamepassesSection />
       <HotItems />
       <HomeCta />
     </>
