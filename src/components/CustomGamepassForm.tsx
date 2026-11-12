@@ -112,10 +112,7 @@ export function CustomGamepassForm() {
             ? formatBrl(amountBrl)
             : "R$ 0,00"}
         </p>
-        <p className="mt-1 text-xs text-[var(--fg-muted)]">
-          Pagamento via Pix com confirmação automática (MisticPay).
-        </p>
-      </div>
+              </div>
 
       {error ? (
         <p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
