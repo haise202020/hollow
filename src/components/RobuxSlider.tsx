@@ -30,7 +30,7 @@ export function RobuxSlider() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="animate-rise overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 p-6 shadow-[0_0_40px_rgba(0,0,0,0.3)] backdrop-blur-md md:p-8">
+      <div className="animate-rise overflow-hidden rounded-2xl border-none bg-[#0c0a14]/80 p-6 shadow-[0_0_40px_rgba(0,0,0,0.3)] backdrop-blur-md md:p-8">
         {/* Glass highlight */}
         <div
           aria-hidden

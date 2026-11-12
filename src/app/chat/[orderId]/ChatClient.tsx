@@ -264,7 +264,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
     ] ?? statusConfig.AGUARDANDO;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#08090d] text-white">
+    <div className="flex min-h-screen flex-col bg-[#05030e] text-white">
       <div className="relative flex-1 overflow-x-hidden">
         <main className="site-container relative py-8 md:py-12">
           <div className="grid gap-6 lg:grid-cols-[380px_1fr] lg:gap-8">
