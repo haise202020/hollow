@@ -26,7 +26,7 @@ export default function RobuxPage() {
         <p className="text-sm font-medium uppercase tracking-[0.14em] text-[var(--accent-bright)]">
           Robux
         </p>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-white md:text-4xl">
+        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-white md:text-5xl">
           Escolha quantos Robux você quer
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-[var(--fg-muted)] md:text-base">

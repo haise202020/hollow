@@ -5,9 +5,9 @@ const year = new Date().getFullYear();
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-white/5 bg-[#0a0a0f]">
-      <div className="site-container py-12 md:py-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="mt-auto border-t border-white/5 bg-[#05030e]">
+      <div className="site-container py-6 md:py-8">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-3">
             <p className="font-display text-xl font-bold text-white">hollow</p>
@@ -94,7 +94,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-xs text-[var(--fg-muted)] sm:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-5 text-xs text-[var(--fg-muted)] sm:flex-row">
           <p>&copy; {year} Hollow. Todos os direitos reservados.</p>
           <p>
             Hollow não é afiliada ou endossada pela Roblox Corporation.

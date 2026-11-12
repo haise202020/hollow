@@ -7,7 +7,7 @@ import { ProductPriceRow } from "./ProductPriceRow";
 export function HotItems() {
   const items = catalogByCategory("permanent").slice(0, 5);
   return (
-    <section className="site-container relative overflow-visible py-14 md:py-16">
+    <section className="site-container relative overflow-visible py-8 md:py-10">
       <div className="mb-10 text-center">
         <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-bright)] md:text-sm">
           Blox Fruits

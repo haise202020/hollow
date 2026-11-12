@@ -24,7 +24,7 @@ export function GamepassesSection() {
   const currentItem = SHOWCASE_ITEMS[activeIndex];
 
   return (
-    <section className="relative overflow-hidden border-t border-white/[0.06] bg-[var(--bg)]">
+    <section className="relative overflow-hidden bg-[var(--bg)]">
       {/* Ambient glow */}
       <div
         aria-hidden
