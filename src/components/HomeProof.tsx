@@ -284,7 +284,7 @@ export function HomeProof() {
       />
 
       <div className="site-container relative py-20 md:py-28 lg:py-32">
-        <div className="grid items-center gap-20 lg:grid-cols-2 lg:gap-28">
+        <div className="grid items-center gap-28 lg:grid-cols-2 lg:gap-44">
           {/* Left: 3D Phone with Lock Screen */}
           <div className="flex items-center justify-center lg:justify-start">
             <PhoneMockup />

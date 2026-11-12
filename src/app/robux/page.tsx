@@ -9,7 +9,18 @@ export const metadata: Metadata = {
 
 export default function RobuxPage() {
   return (
-    <div className="site-container pb-14 pt-20 md:pb-16 md:pt-24">
+    <div className="relative site-container pb-14 pt-20 md:pb-16 md:pt-24">
+      {/* Fumaça roxa esquerda */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-[15%] top-[10%] h-[500px] w-[500px] rounded-full bg-[rgba(168,85,247,0.06)] blur-[120px]"
+      />
+      {/* Fumaça roxa direita */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-[15%] bottom-[15%] h-[450px] w-[450px] rounded-full bg-[rgba(168,85,247,0.05)] blur-[110px]"
+      />
+
       {/* Header centralizado */}
       <div className="mx-auto max-w-2xl animate-rise text-center">
         <p className="text-sm font-medium uppercase tracking-[0.14em] text-[var(--accent-bright)]">
@@ -48,7 +59,7 @@ export default function RobuxPage() {
           ].map((item) => (
             <div
               key={item.title}
-              className="rounded-xl border border-white/[0.06] bg-[#0c0c10] p-5 transition-colors hover:border-[var(--accent)]/20"
+              className="rounded-xl border border-white/[0.08] bg-[#0c0a14]/80 p-5 backdrop-blur-md transition-colors hover:border-[var(--accent)]/20"
             >
               <h3 className="font-display text-base font-semibold text-white">
                 {item.title}
