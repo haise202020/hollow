@@ -71,7 +71,7 @@ export function ComprasClient() {
       </div>
 
       {list.length === 0 ? (
-        <div className="rounded-2xl border border-white/[0.06] bg-[#0c0c10] px-6 py-12 text-center">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 px-6 py-12 text-center backdrop-blur-md">
           <p className="text-white">
             {tab === "pendentes"
               ? "Nenhuma compra pendente"
@@ -95,7 +95,7 @@ export function ComprasClient() {
             return (
               <article
                 key={order.id}
-                className="rounded-2xl border border-white/[0.06] bg-[#0c0c10] p-5 transition hover:border-[var(--accent)]/25"
+                className="rounded-2xl border border-white/[0.08] bg-[#0c0a14]/80 p-5 backdrop-blur-md transition hover:border-[var(--accent)]/25"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
