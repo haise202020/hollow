@@ -16,6 +16,87 @@ type OrderSummary = {
   createdAt: string;
 };
 
+/* ─── Ícones SVG inline (fiéis à referência) ─── */
+function IconBag({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    </svg>
+  );
+}
+
+function IconCube({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+  );
+}
+
+function IconUser({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  );
+}
+
+function IconCalendar({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  );
+}
+
+function IconCoins({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function IconAlertCircle({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  );
+}
+
+function IconLock({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    </svg>
+  );
+}
+
+function IconChatBubble({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+  );
+}
+
+function IconSend({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+    </svg>
+  );
+}
+
+function IconInfo({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
 export function ChatClient({ orderId }: { orderId: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [order, setOrder] = useState<OrderSummary | null>(null);
@@ -185,13 +266,13 @@ export function ChatClient({ orderId }: { orderId: string }) {
     ] ?? statusConfig.AGUARDANDO;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--bg)] text-white">
-      {/* Header — consistente com o resto do site */}
+    <div className="flex min-h-screen flex-col bg-[#08090d] text-white">
+      {/* Header principal do site */}
       <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#07070a]/95 backdrop-blur-xl">
         <div className="site-container flex h-[72px] items-center justify-between">
           <Link
             href="/"
-            className="flex items-center transition opacity-90 hover:opacity-100"
+            className="flex items-center gap-2.5 transition opacity-90 hover:opacity-100"
           >
             <Image
               src="/logo.png"
@@ -201,6 +282,9 @@ export function ChatClient({ orderId }: { orderId: string }) {
               priority
               className="h-9 w-auto"
             />
+            <span className="font-display text-xl font-bold tracking-tight text-white">
+              hollow
+            </span>
           </Link>
 
           <div className="flex items-center gap-3">
@@ -211,337 +295,318 @@ export function ChatClient({ orderId }: { orderId: string }) {
               href="/"
               className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white transition hover:border-[var(--accent)]/50 hover:bg-white/[0.06]"
             >
-              Voltar
+              ← Voltar
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="site-container flex-1 py-6 md:py-8">
-        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-          {/* Sidebar — Resumo do Pedido */}
-          <aside className="space-y-4">
-            <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[var(--bg-elevated)]">
-              {/* Header do card */}
-              <div className="border-b border-white/[0.06] px-5 py-4">
-                <h2 className="font-display text-sm font-semibold text-white">
-                  Resumo do Pedido
-                </h2>
-                <p className="mt-0.5 font-mono text-[11px] text-[var(--fg-muted)]">
-                  {orderId}
-                </p>
+      {/* Fundo com gradientes roxos sutis */}
+      <div className="relative flex-1">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-[-10%] top-[-5%] h-[600px] w-[600px] rounded-full bg-[rgba(139,92,246,0.06)] blur-[150px]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-[-10%] bottom-[10%] h-[500px] w-[500px] rounded-full bg-[rgba(139,92,246,0.04)] blur-[120px]"
+        />
+
+        <main className="site-container relative py-8 md:py-12">
+          <div className="grid gap-6 lg:grid-cols-[380px_1fr] lg:gap-8">
+            {/* ═══════════════════════════════════════
+                COLUNA ESQUERDA — Resumo do Pedido
+            ═══════════════════════════════════════ */}
+            <aside className="space-y-4">
+              {/* Card: Resumo do Pedido */}
+              <div className="overflow-hidden rounded-2xl border border-[#262433] bg-[#17161f]">
+                {/* Header do card */}
+                <div className="border-b border-[#262433] px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
+                      <IconBag className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h2 className="font-display text-sm font-semibold text-white">
+                        Resumo do Pedido
+                      </h2>
+                      <p className="mt-0.5 font-mono text-[10px] text-[var(--fg-muted)]">
+                        {orderId}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="divide-y divide-[#262433] px-5">
+                  {/* Status */}
+                  <div className="flex items-center justify-between py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <IconAlertCircle className="h-4 w-4 text-[var(--fg-muted)]" />
+                      <span className="text-sm text-[var(--fg-muted)]">Status</span>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${currentStatus.color} ${currentStatus.bg}`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${currentStatus.dot}`}
+                      />
+                      {currentStatus.label}
+                    </span>
+                  </div>
+
+                  {/* Produto */}
+                  <div className="py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <IconCube className="h-4 w-4 text-[var(--fg-muted)]" />
+                      <span className="text-sm text-[var(--fg-muted)]">Produto</span>
+                    </div>
+                    <div className="mt-3 flex items-center gap-3 rounded-xl bg-[#1e1c28] p-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
+                        <IconCube className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-white">
+                          {order?.productLabel ?? "—"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-[var(--accent-bright)]">
+                          R${" "}
+                          {order?.amountBrl?.toLocaleString("pt-BR", {
+                            minimumFractionDigits: 2,
+                          }) ?? "—"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Conta Roblox */}
+                  <div className="flex items-center justify-between py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <IconUser className="h-4 w-4 text-[var(--fg-muted)]" />
+                      <span className="text-sm text-[var(--fg-muted)]">Conta Roblox</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent)]/15 text-[10px] font-bold text-[var(--accent)]">
+                        {order?.robloxUsername?.[0]?.toUpperCase() ?? "?"}
+                      </div>
+                      <span className="text-sm font-medium text-white">
+                        {order?.robloxUsername ?? "—"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Gamepass link */}
+                  {order?.robloxGamepassId && (
+                    <div className="py-3.5">
+                      <a
+                        href={`https://www.roblox.com/game-pass/${order.robloxGamepassId}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-medium text-[var(--accent)] transition hover:text-[var(--accent-bright)]"
+                      >
+                        Ver gamepass no Roblox ↗
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Data */}
+                  <div className="flex items-center justify-between py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <IconCalendar className="h-4 w-4 text-[var(--fg-muted)]" />
+                      <span className="text-sm text-[var(--fg-muted)]">Data</span>
+                    </div>
+                    <span className="text-sm text-white">
+                      {order ? formatDate(order.createdAt) : "—"}
+                    </span>
+                  </div>
+
+                  {/* Total pago — destaque roxo */}
+                  <div className="flex items-center justify-between rounded-xl bg-[var(--accent)]/10 px-4 py-3.5 my-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <IconCoins className="h-4 w-4 text-[var(--accent)]" />
+                      <span className="text-sm font-medium text-[var(--fg-muted)]">
+                        Total pago
+                      </span>
+                    </div>
+                    <span className="text-base font-bold text-white">
+                      R${" "}
+                      {order?.amountBrl?.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      }) ?? "—"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="divide-y divide-white/[0.06] px-5">
-                {/* Status badge */}
-                <div className="flex items-center justify-between py-3.5">
-                  <span className="text-xs text-[var(--fg-muted)]">Status</span>
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${currentStatus.color} ${currentStatus.bg}`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${currentStatus.dot}`}
-                    />
-                    {currentStatus.label}
-                  </span>
+              {/* Card: Privacidade */}
+              <div className="rounded-2xl border border-[#262433] bg-[#17161f] px-5 py-4">
+                <div className="flex items-start gap-3">
+                  <IconLock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--fg-muted)]" />
+                  <p className="text-xs leading-relaxed text-[var(--fg-muted)]">
+                    Suas informações estão protegidas. Apenas a equipe Hollow tem
+                    acesso a este chat.
+                  </p>
                 </div>
+              </div>
+            </aside>
 
-                {/* Produto */}
-                <div className="py-3.5">
-                  <span className="text-xs text-[var(--fg-muted)]">Produto</span>
-                  <div className="mt-2 flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-[var(--accent)]">
-                      <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={1.5}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                        />
-                      </svg>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-white">
-                        {order?.productLabel ?? "—"}
-                      </p>
-                      <p className="mt-0.5 text-xs text-[var(--accent-bright)]">
-                        R${" "}
-                        {order?.amountBrl?.toLocaleString("pt-BR", {
-                          minimumFractionDigits: 2,
-                        }) ?? "—"}
-                      </p>
-                    </div>
+            {/* ═══════════════════════════════════════
+                COLUNA DIREITA — Chat de suporte
+            ═══════════════════════════════════════ */}
+            <section className="flex min-h-[calc(100vh-200px)] flex-col overflow-hidden rounded-2xl border border-[#262433] bg-[#17161f]">
+              {/* Chat header */}
+              <div className="flex items-center justify-between border-b border-[#262433] px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
+                    <IconChatBubble className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-base font-semibold text-white">
+                      Chat de suporte
+                    </h2>
+                    <p className="text-xs text-[var(--fg-muted)]">
+                      Respondemos em poucos minutos.
+                    </p>
                   </div>
                 </div>
-
-                {/* Usuário Roblox */}
-                <div className="flex items-center justify-between py-3.5">
-                  <span className="text-xs text-[var(--fg-muted)]">
-                    Conta Roblox
+                <div className="flex items-center gap-2 rounded-full bg-emerald-400/10 px-3 py-1.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                   </span>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent)]/15 text-[10px] font-bold text-[var(--accent)]">
-                      {order?.robloxUsername?.[0]?.toUpperCase() ?? "?"}
-                    </div>
-                    <span className="text-xs font-medium text-white">
-                      {order?.robloxUsername ?? "—"}
-                    </span>
-                  </div>
+                  <span className="text-xs font-medium text-emerald-400">
+                    Online
+                  </span>
                 </div>
+              </div>
 
-                {/* Gamepass link */}
-                {order?.robloxGamepassId && (
-                  <div className="py-3.5">
-                    <span className="text-xs text-[var(--fg-muted)]">
-                      Gamepass
-                    </span>
-                    <a
-                      href={`https://www.roblox.com/game-pass/${order.robloxGamepassId}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-1 block truncate text-xs font-medium text-[var(--accent)] transition hover:text-[var(--accent-bright)]"
-                    >
-                      Ver no Roblox ↗
-                    </a>
+              {/* Área de mensagens */}
+              <div
+                ref={scrollContainerRef}
+                className="flex-1 space-y-5 overflow-y-auto px-6 py-6"
+              >
+                {messages.length === 0 && !error && (
+                  <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--accent)]/15 shadow-[0_0_30px_rgba(139,92,246,0.15)]">
+                      <IconChatBubble className="h-7 w-7 text-[var(--accent)]" />
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-white">
+                        Nenhuma mensagem ainda.
+                      </p>
+                      <p className="mt-1 text-sm text-[var(--fg-muted)]">
+                        Envie a primeira para iniciar o atendimento.
+                      </p>
+                    </div>
                   </div>
                 )}
 
-                {/* Data */}
-                <div className="flex items-center justify-between py-3.5">
-                  <span className="text-xs text-[var(--fg-muted)]">Data</span>
-                  <span className="text-xs text-white">
-                    {order ? formatDate(order.createdAt) : "—"}
-                  </span>
-                </div>
+                {messages.map((msg) => {
+                  const isSystem = msg.sender === "system" || msg.isAutoMessage;
+                  const isCustomer = msg.sender === "customer";
 
-                {/* Total */}
-                <div className="flex items-center justify-between py-3.5">
-                  <span className="text-xs font-medium text-[var(--fg-muted)]">
-                    Total pago
-                  </span>
-                  <span className="text-sm font-bold text-white">
-                    R${" "}
-                    {order?.amountBrl?.toLocaleString("pt-BR", {
-                      minimumFractionDigits: 2,
-                    }) ?? "—"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Info de segurança */}
-            <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] px-4 py-3">
-              <div className="flex items-start gap-2.5">
-                <svg
-                  className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--fg-muted)]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-                <p className="text-[11px] leading-relaxed text-[var(--fg-muted)]">
-                  Suas informações estão protegidas. Apenas a equipe Hollow tem
-                  acesso a este chat.
-                </p>
-              </div>
-            </div>
-          </aside>
-
-          {/* Chat principal */}
-          <section className="flex min-h-[calc(100vh-180px)] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[var(--bg-elevated)]">
-            {/* Chat header */}
-            <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
-              <div>
-                <h2 className="font-display text-base font-semibold text-white">
-                  Chat de suporte
-                </h2>
-                <p className="mt-0.5 text-xs text-[var(--fg-muted)]">
-                  Respondemos em poucos minutos
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                </span>
-                <span className="text-xs font-medium text-emerald-400">
-                  Online
-                </span>
-              </div>
-            </div>
-
-            {/* Área de mensagens */}
-            <div
-              ref={scrollContainerRef}
-              className="flex-1 space-y-5 overflow-y-auto px-6 py-6"
-            >
-              {messages.length === 0 && !error && (
-                <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.04]">
-                    <svg
-                      className="h-5 w-5 text-[var(--fg-muted)]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-[var(--fg-muted)]">
-                    Nenhuma mensagem ainda.
-                    <br />
-                    Envie a primeira para iniciar o atendimento.
-                  </p>
-                </div>
-              )}
-
-              {messages.map((msg) => {
-                const isSystem = msg.sender === "system" || msg.isAutoMessage;
-                const isCustomer = msg.sender === "customer";
-
-                // Mensagens de sistema são centralizadas
-                if (isSystem) {
-                  return (
-                    <div key={msg.id} className="flex justify-center py-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-[11px] text-[var(--fg-muted)]">
-                        <svg
-                          className="h-3 w-3"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        {msg.content}
-                      </span>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex gap-3 ${isCustomer ? "flex-row-reverse" : ""}`}
-                  >
-                    {/* Avatar */}
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-                        isCustomer
-                          ? "bg-[var(--accent)]/15 text-[var(--accent)]"
-                          : "bg-white/[0.06] text-white"
-                      }`}
-                    >
-                      {isCustomer
-                        ? (order?.robloxUsername?.[0]?.toUpperCase() ?? "U")
-                        : (msg.senderName?.[0]?.toUpperCase() ?? "E")}
-                    </div>
-
-                    {/* Bubble */}
-                    <div
-                      className={`max-w-[75%] space-y-1 ${isCustomer ? "items-end" : "items-start"}`}
-                    >
-                      <div
-                        className={`flex items-center gap-2 ${isCustomer ? "flex-row-reverse" : ""}`}
-                      >
-                        <span className="text-[11px] font-medium text-[var(--fg-muted)]">
-                          {msg.senderName}
+                  if (isSystem) {
+                    return (
+                      <div key={msg.id} className="flex justify-center py-2">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#262433] bg-[#1e1c28] px-3 py-1.5 text-[11px] text-[var(--fg-muted)]">
+                          <IconInfo className="h-3 w-3" />
+                          {msg.content}
                         </span>
                       </div>
+                    );
+                  }
 
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-3 ${isCustomer ? "flex-row-reverse" : ""}`}
+                    >
+                      {/* Avatar */}
                       <div
-                        className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
                           isCustomer
-                            ? "rounded-tr-md bg-[var(--accent)] text-white"
-                            : "rounded-tl-md border border-white/[0.06] bg-[var(--bg-panel)] text-white"
+                            ? "bg-[var(--accent)]/15 text-[var(--accent)]"
+                            : "bg-white/[0.06] text-white"
                         }`}
                       >
-                        {msg.content}
+                        {isCustomer
+                          ? (order?.robloxUsername?.[0]?.toUpperCase() ?? "U")
+                          : (msg.senderName?.[0]?.toUpperCase() ?? "E")}
                       </div>
 
-                      <span className="text-[10px] text-[var(--fg-muted)]">
-                        {formatTime(msg.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                      {/* Bubble */}
+                      <div
+                        className={`max-w-[75%] space-y-1 ${isCustomer ? "items-end" : "items-start"}`}
+                      >
+                        <div
+                          className={`flex items-center gap-2 ${isCustomer ? "flex-row-reverse" : ""}`}
+                        >
+                          <span className="text-[11px] font-medium text-[var(--fg-muted)]">
+                            {msg.senderName}
+                          </span>
+                        </div>
 
-            {/* Input area */}
-            <form
-              onSubmit={sendMessage}
-              className="border-t border-white/[0.06] p-4"
-            >
-              {error && (
-                <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2">
-                  <p className="text-xs text-red-300">{error}</p>
-                </div>
-              )}
-              <div className="flex items-end gap-3">
-                <div className="relative flex-1">
-                  <textarea
-                    ref={textareaRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Digite sua mensagem…"
-                    maxLength={2000}
-                    rows={1}
-                    className="w-full resize-none rounded-xl border border-white/[0.08] bg-[var(--bg-panel)] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:shadow-[0_0_0_3px_var(--accent-glow)]"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={!input.trim() || sending}
-                  className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[var(--accent)] text-white transition hover:bg-[var(--accent-bright)] hover:shadow-[0_0_20px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {sending ? (
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  ) : (
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                      />
-                    </svg>
-                  )}
-                </button>
+                        <div
+                          className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                            isCustomer
+                              ? "rounded-tr-md bg-[var(--accent)] text-white"
+                              : "rounded-tl-md border border-[#262433] bg-[#1e1c28] text-white"
+                          }`}
+                        >
+                          {msg.content}
+                        </div>
+
+                        <span className="text-[10px] text-[var(--fg-muted)]">
+                          {formatTime(msg.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <p className="mt-2 text-center text-[10px] text-[var(--fg-muted)]">
-                Pressione Enter para enviar · Shift+Enter para nova linha
-              </p>
-            </form>
-          </section>
-        </div>
-      </main>
+
+              {/* Input area */}
+              <form
+                onSubmit={sendMessage}
+                className="border-t border-[#262433] p-4"
+              >
+                {error && (
+                  <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2">
+                    <p className="text-xs text-red-300">{error}</p>
+                  </div>
+                )}
+                <div className="flex items-end gap-3">
+                  <div className="relative flex-1">
+                    <textarea
+                      ref={textareaRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Digite sua mensagem…"
+                      maxLength={2000}
+                      rows={1}
+                      className="w-full resize-none rounded-xl border border-[#262433] bg-[#1e1c28] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || sending}
+                    className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[var(--accent)] text-white transition hover:bg-[var(--accent-bright)] hover:shadow-[0_0_20px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {sending ? (
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    ) : (
+                      <IconSend className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                <p className="mt-2 text-center text-[10px] text-[var(--fg-muted)]">
+                  Pressione Enter para enviar · Shift+Enter para nova linha
+                </p>
+              </form>
+            </section>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
