@@ -319,9 +319,9 @@ export function ChatClient({ orderId }: { orderId: string }) {
             ═══════════════════════════════════════ */}
             <aside className="space-y-4">
               {/* Card: Resumo do Pedido */}
-              <div className="overflow-hidden rounded-2xl border border-[#262433] bg-[#17161f]">
+              <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0a14]/80 backdrop-blur-xl">
                 {/* Header do card */}
-                <div className="border-b border-[#262433] px-5 py-4">
+                <div className="border-b border-white/[0.06] px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
                       <IconBag className="h-5 w-5" />
@@ -337,7 +337,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
                   </div>
                 </div>
 
-                <div className="divide-y divide-[#262433] px-5">
+                <div className="divide-y divide-white/[0.06] px-5">
                   {/* Status */}
                   <div className="flex items-center justify-between py-3.5">
                     <div className="flex items-center gap-2.5">
@@ -360,7 +360,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
                       <IconCube className="h-4 w-4 text-[var(--fg-muted)]" />
                       <span className="text-sm text-[var(--fg-muted)]">Produto</span>
                     </div>
-                    <div className="mt-3 flex items-center gap-3 rounded-xl bg-[#1e1c28] p-3">
+                    <div className="mt-3 flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
                         <IconCube className="h-5 w-5" />
                       </div>
@@ -438,7 +438,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
               </div>
 
               {/* Card: Privacidade */}
-              <div className="rounded-2xl border border-[#262433] bg-[#17161f] px-5 py-4">
+              <div className="rounded-2xl border border-white/[0.06] bg-[#0c0a14]/80 px-5 py-4 backdrop-blur-xl">
                 <div className="flex items-start gap-3">
                   <IconLock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--fg-muted)]" />
                   <p className="text-xs leading-relaxed text-[var(--fg-muted)]">
@@ -452,9 +452,9 @@ export function ChatClient({ orderId }: { orderId: string }) {
             {/* ═══════════════════════════════════════
                 COLUNA DIREITA — Chat de suporte
             ═══════════════════════════════════════ */}
-            <section className="flex min-h-[calc(100vh-200px)] flex-col overflow-hidden rounded-2xl border border-[#262433] bg-[#17161f]">
+            <section className="flex min-h-[calc(100vh-200px)] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0a14]/80 backdrop-blur-xl">
               {/* Chat header */}
-              <div className="flex items-center justify-between border-b border-[#262433] px-6 py-4">
+              <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)]/15 text-[var(--accent)]">
                     <IconChatBubble className="h-5 w-5" />
@@ -507,7 +507,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
                   if (isSystem) {
                     return (
                       <div key={msg.id} className="flex justify-center py-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#262433] bg-[#1e1c28] px-3 py-1.5 text-[11px] text-[var(--fg-muted)]">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-[11px] text-[var(--fg-muted)]">
                           <IconInfo className="h-3 w-3" />
                           {msg.content}
                         </span>
@@ -549,7 +549,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
                           className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                             isCustomer
                               ? "rounded-tr-md bg-[var(--accent)] text-white"
-                              : "rounded-tl-md border border-[#262433] bg-[#1e1c28] text-white"
+                              : "rounded-tl-md border border-white/[0.06] bg-white/[0.04] text-white"
                           }`}
                         >
                           {msg.content}
@@ -567,7 +567,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
               {/* Input area */}
               <form
                 onSubmit={sendMessage}
-                className="border-t border-[#262433] p-4"
+                className="border-t border-white/[0.06] p-4"
               >
                 {error && (
                   <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2">
@@ -584,7 +584,7 @@ export function ChatClient({ orderId }: { orderId: string }) {
                       placeholder="Digite sua mensagem…"
                       maxLength={2000}
                       rows={1}
-                      className="w-full resize-none rounded-xl border border-[#262433] bg-[#1e1c28] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]"
+                      className="w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 pr-4 text-sm text-white placeholder-[var(--fg-muted)] outline-none transition focus:border-[var(--accent)]/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]"
                     />
                   </div>
                   <button
